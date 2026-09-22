@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CaseGuard — TigerGraph Agentic Fraud Investigation</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+</head>
+<body>
+  <!-- Ambient Background Glows (Hacker House Goa Vibe) -->
+  <div class="ambient-glow">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
+
+  <div class="app-container">
+    <!-- Top Navigation Header (Glassmorphic) -->
+    <header class="glass-header">
+      <div class="brand-section">
+        <div class="brand-logo-badge">🛡️</div>
+        <div class="brand-meta">
+          <h1>CaseGuard</h1>
+          <p>TigerGraph HHGOA Hackathon · Uncertainty-Gated Fraud Engine</p>
+        </div>
+      </div>
+
+      <div class="header-badges">
+        <div class="pill-badge active">
+          <span class="status-dot"></span>
+          <span>TigerGraph GSQL: Active</span>
+        </div>
+        <div class="pill-badge">
+          <span>Benchmarked: 20 Cases</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Workspace Grid -->
+    <main class="workspace">
+      <!-- Left Sidebar: Case Navigator (Clay & Glass) -->
+      <aside class="case-sidebar">
+        <div class="sidebar-heading">
+          <span>Benchmark Dossiers</span>
+          <span class="case-count" id="caseCountBadge">20 Cases</span>
+        </div>
+        <div class="cases-list custom-scroll" id="casesListContainer">
+          <!-- Populated by app.js -->
+        </div>
+      </aside>
+
+      <!-- Right Column: Interactive Analyst Console -->
+      <section class="main-dashboard">
+        <!-- Top Hero Stats Row (Claymorphic) -->
+        <div class="hero-stats-grid">
+          <div class="clay-stat-card">
+            <div class="clay-stat-label">Investigated Entity</div>
+            <div class="clay-stat-value" id="statTargetId">--</div>
+            <div class="clay-stat-sub" id="statTargetType">Type: --</div>
+          </div>
+
+          <div class="clay-stat-card">
+            <div class="clay-stat-label">Trigger Risk Score</div>
+            <div class="clay-stat-value" id="statRiskScore">--</div>
+            <div class="clay-stat-sub" id="statTriggerReason">Alert Rule</div>
+          </div>
+
+          <div class="clay-stat-card">
+            <div class="clay-stat-label">Agent Confidence</div>
+            <div class="clay-stat-value" id="statConfidence">--</div>
+            <div class="clay-stat-sub" id="statRiskLevel">Assessed Risk</div>
+          </div>
+
+          <div class="clay-stat-card">
+            <div class="clay-stat-label">Graph Audit Persisted</div>
+            <div class="clay-stat-value" id="statGraphWritten">✅ Yes</div>
+            <div class="clay-stat-sub">TigerGraph DB Lineage</div>
+          </div>
+        </div>
+
+        <!-- Glassmorphism Tab Bar -->
+        <nav class="glass-tabs-nav">
+          <button class="tab-btn active" data-tab="tab-nba">
+            <span>🎯 Next Best Action</span>
+          </button>
+          <button class="tab-btn" data-tab="tab-uncertainty">
+            <span>📊 Uncertainty Engine</span>
+          </button>
+          <button class="tab-btn" data-tab="tab-evidence">
+            <span>🔎 Evidence & Lineage</span>
+          </button>
+          <button class="tab-btn" data-tab="tab-approvals">
+            <span>⚖️ Approval Queue</span>
+          </button>
+          <button class="tab-btn" data-tab="tab-sar">
+            <span>📜 FinCEN SAR</span>
+          </button>
+        </nav>
+
+        <!-- TAB 1: Next Best Action (Before vs After Evidence) -->
+        <div class="tab-panel active" id="tab-nba">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title">Next-Best-Action Progression</h2>
+              <p class="panel-description">Explicit before & after evidence progression required by hackathon judging criteria.</p>
+            </div>
+            <span class="pill-badge" id="nbaStatusPill">Evaluated</span>
+          </div>
+
+          <div class="nba-comparison-grid">
+            <!-- NBA Before Evidence -->
+            <div class="nba-card">
+              <span class="nba-badge nba-before-badge">1. Before Targeted Evidence</span>
+              <div class="nba-action-title" id="nbaBeforeAction">--</div>
+              <div class="nba-meta-row">
+                <span class="nba-meta-item">Route: <strong id="nbaBeforeRoute">--</strong></span>
+                <span class="nba-meta-item">Confidence: <strong id="nbaBeforeConfidence">--</strong></span>
+              </div>
+              <p class="nba-reasoning" id="nbaBeforeReasoning">--</p>
+            </div>
+
+            <!-- NBA After Evidence -->
+            <div class="nba-card">
+              <span class="nba-badge nba-after-badge">2. After Targeted Evidence</span>
+              <div class="nba-action-title" id="nbaAfterAction">--</div>
+              <div class="nba-meta-row">
+                <span class="nba-meta-item">Route: <strong id="nbaAfterRoute">--</strong></span>
+                <span class="nba-meta-item">Confidence: <strong id="nbaAfterConfidence">--</strong></span>
+              </div>
+              <p class="nba-reasoning" id="nbaAfterReasoning">--</p>
+            </div>
+          </div>
+
+          <div class="panel-header" style="margin-top: 20px;">
+            <div>
+              <h3 class="panel-title" style="font-size: 1rem;">Action Execution Log</h3>
+            </div>
+          </div>
+
+          <table class="glass-table">
+            <thead>
+              <tr>
+                <th>Action</th>
+                <th>Status</th>
+                <th>Approval Route</th>
+                <th>Timestamp</th>
+                <th>Policy Rule</th>
+              </tr>
+            </thead>
+            <tbody id="actionsTableBody">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- TAB 2: Uncertainty Engine Decomposition -->
+        <div class="tab-panel" id="tab-uncertainty">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title">Quantitative Uncertainty Decomposition</h2>
+              <p class="panel-description">Confidence = w₁·Graph + w₂·History + w₃·Signal + w₄·Coverage − ContradictionPenalty</p>
+            </div>
+          </div>
+
+          <div class="confidence-container">
+            <div style="display: flex; justify-content: space-between; font-weight: 700; font-size: 0.9rem;">
+              <span>Calibrated Decision Confidence</span>
+              <span id="uncertaintyScoreText">0%</span>
+            </div>
+            <div class="confidence-bar-bg">
+              <div class="confidence-bar-fill" id="confidenceBarFill" style="width: 50%;"></div>
+            </div>
+          </div>
+
+          <div class="hero-stats-grid" style="margin-top: 24px;">
+            <div class="clay-stat-card">
+              <div class="clay-stat-label">Graph Support (w=0.35)</div>
+              <div class="clay-stat-value" id="compGraphSupport">0.00</div>
+              <div class="clay-stat-sub">GSQL Traversal Density</div>
+            </div>
+            <div class="clay-stat-card">
+              <div class="clay-stat-label">Historical Rate (w=0.25)</div>
+              <div class="clay-stat-value" id="compHistRate">0.00</div>
+              <div class="clay-stat-sub">Similar Closed Cases</div>
+            </div>
+            <div class="clay-stat-card">
+              <div class="clay-stat-label">Signal Strength (w=0.25)</div>
+              <div class="clay-stat-value" id="compSignalStrength">0.00</div>
+              <div class="clay-stat-sub">Bank Model & Velocity</div>
+            </div>
+            <div class="clay-stat-card">
+              <div class="clay-stat-label">Evidence Coverage (w=0.15)</div>
+              <div class="clay-stat-value" id="compEvidenceCoverage">0.00</div>
+              <div class="clay-stat-sub">Typology Checklist</div>
+            </div>
+          </div>
+
+          <div style="margin-top: 28px;">
+            <h3 style="font-size: 1rem; margin-bottom: 12px;">Uncertainty Attribution & Reasoning:</h3>
+            <div id="uncertaintyReasonsList" style="display: flex; flex-direction: column; gap: 8px;">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: Evidence & Graph Lineage -->
+        <div class="tab-panel" id="tab-evidence">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title">TigerGraph Evidence Trail</h2>
+              <p class="panel-description">Lineage linking transactions, accounts, devices, and detected GSQL typologies.</p>
+            </div>
+          </div>
+
+          <table class="glass-table">
+            <thead>
+              <tr>
+                <th>Evidence ID</th>
+                <th>Source</th>
+                <th>Signal Type</th>
+                <th>Weight</th>
+                <th>Content & Graph Path</th>
+              </tr>
+            </thead>
+            <tbody id="evidenceTableBody">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+
+          <div style="margin-top: 30px;">
+            <h3 style="font-size: 1rem; margin-bottom: 12px;">Matched Fraud Typologies</h3>
+            <div id="matchedPatternsContainer" style="display: flex; gap: 12px; flex-wrap: wrap;">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+
+          <div style="margin-top: 30px;">
+            <h3 style="font-size: 1rem; margin-bottom: 12px;">Recalled Case Memory (Closed Historical Investigations)</h3>
+            <div id="caseMemoryContainer" style="display: flex; gap: 12px; flex-wrap: wrap;">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 4: Human-in-the-Loop Approval Queue -->
+        <div class="tab-panel" id="tab-approvals">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title">Policy-Gated Approval Queue</h2>
+              <p class="panel-description">Strict institutional guardrail: High-impact actions require senior analyst confirmation.</p>
+            </div>
+          </div>
+
+          <div id="approvalQueueContainer">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- TAB 5: FinCEN SAR Report -->
+        <div class="tab-panel" id="tab-sar">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title">Suspicious Activity Report (SAR)</h2>
+              <p class="panel-description">BSA/AML Policy §4.2 & 31 CFR 1020.320 Regulatory Filings.</p>
+            </div>
+            <span class="pill-badge" id="sarStatusBadge">Required</span>
+          </div>
+
+          <div class="sar-dossier-box" id="sarDossierContent">
+            No SAR required for this investigation case.
+          </div>
+        </div>
+
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
