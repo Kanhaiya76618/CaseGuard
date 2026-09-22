@@ -17,28 +17,19 @@ LangGraph Agent (stateful cyclic loop)
      └── GraphRAG (policy/typology grounding)
 ```
 
-## Setup
+## Setup & Quickstart
 
 ```bash
-# 1. Clone and install
-pip install -r requirements.txt
+# 1. Clone repository
+git clone https://github.com/Kanhaiya76618/CaseGuard.git
+cd CaseGuard
 
-# 2. Configure environment
-cp .env.example .env
-# Fill in: TG_HOST, TG_GRAPHNAME, TG_USERNAME, TG_PASSWORD, OPENAI_API_KEY
+# 2. Run the dynamic Hacker House Goa UI & Live API Server
+python3 scripts/serve_live.py
+# Open http://localhost:8000 in your browser!
 
-# 3. Set up TigerGraph schema + load data
-python scripts/setup_schema.py
-python scripts/load_data.py --data-dir ./data/
-
-# 4. Install GSQL queries
-python scripts/install_queries.py
-
-# 5. Run the agent on benchmark cases
-python scripts/run_benchmark.py --cases-dir ./data/benchmark_cases/
-
-# 6. Launch the analyst UI
-streamlit run ui/app.py
+# 3. Or run the official benchmark generator over all 20 cases
+python3 scripts/run_real_benchmarks.py
 ```
 
 ## Project Structure
