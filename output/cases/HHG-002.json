@@ -1,0 +1,165 @@
+{
+  "case_id": "HHG-002",
+  "trigger": {
+    "type": "risk_score",
+    "ref_id": "3478782",
+    "risk_score": 0.79,
+    "amount": 292.36,
+    "reason": "Real-time model scored transaction 3478782 ($292.36, online) at 0.79. Review and decide."
+  },
+  "investigation_record": {
+    "target": {
+      "entity_type": "Customer",
+      "entity_id": "C11891",
+      "card_id": "C11891-K1"
+    },
+    "evidence_gathered": [
+      {
+        "id": "EV-TXN-01",
+        "source": "graph",
+        "type": "transaction_record",
+        "content": "Transaction 3478782 on Card C11891-K1 for $292.36. Trigger: Real-time model scored transaction 3478782 ($292.36, online) at 0.79. Review and decide.",
+        "collected_at": "2026-09-22T15:42:40.656098+00:00",
+        "confidence_weight": 0.45
+      },
+      {
+        "id": "EV-HIST-02",
+        "source": "case_memory",
+        "type": "prior_case_lineage",
+        "content": "Customer C11891 has 1 prior recorded cases in TigerGraph memory (1 confirmed fraud, 0 cleared).",
+        "collected_at": "2026-09-22T15:42:40.656235+00:00",
+        "confidence_weight": 0.4
+      },
+      {
+        "id": "EV-AUTH-03",
+        "source": "external_api",
+        "type": "step_up_auth_result",
+        "content": "Step-up 2FA prompt delivered to registered authenticator. Result: TIMED_OUT",
+        "collected_at": "2026-09-22T15:42:40.656289+00:00",
+        "confidence_weight": 0.6
+      }
+    ],
+    "patterns_matched": [
+      {
+        "pattern_id": "card_not_present_fraud",
+        "name": "Card-Not-Present (CNP) E-Commerce Fraud",
+        "evidence_refs": [
+          "EV-GRAPH-01",
+          "EV-TXN-02"
+        ],
+        "confidence": 0.82
+      }
+    ],
+    "prior_cases_used": [
+      {
+        "case_id": "CC-4160",
+        "similarity": 0.85,
+        "outcome": "confirmed_fraud",
+        "pattern_id": "card_not_present_fraud",
+        "notes": "Case CC-4160: cardholder C11891 reported unrecognized activity on card C11891-K1. 1 transaction(s) between 2016-09-29 and 2016-09-29 totalin"
+      }
+    ],
+    "risk_assessment": {
+      "risk_level": "medium",
+      "confidence": 0.7125,
+      "confidence_components": {
+        "graph_support": 0.5,
+        "historical_rate": 0.0,
+        "signal_strength": 0.94,
+        "evidence_coverage": 0.85,
+        "contradiction_penalty": 0.0,
+        "final": 0.5375
+      },
+      "uncertainty_reasons": [
+        "Low historical fraud rate for similar cases",
+        "Incomplete evidence checklist for the suspected fraud typology",
+        "Overall confidence too low to take action without analyst review"
+      ]
+    }
+  },
+  "next_best_action": {
+    "before_additional_evidence": {
+      "primary_action": "monitor_account",
+      "all_actions": [
+        "request_step_up_auth",
+        "monitor_account"
+      ],
+      "approval_route": "auto",
+      "reasoning": "Confidence 43% is below action threshold. Requesting step-up authentication as least-invasive first step.",
+      "confidence_at_time": 0.4325,
+      "recorded_at": "2026-09-22T15:42:40.656265+00:00",
+      "auto_executable": [
+        "request_step_up_auth",
+        "monitor_account"
+      ],
+      "requires_approval": []
+    },
+    "after_additional_evidence": {
+      "primary_action": "block_transaction",
+      "all_actions": [
+        "block_transaction",
+        "monitor_account",
+        "warn_customer",
+        "create_fraud_case"
+      ],
+      "approval_route": "l1_analyst",
+      "reasoning": "Pattern detected (['card_not_present_fraud']) with confidence 71%. Blocking transaction, monitoring account, notifying customer.",
+      "confidence_at_time": 0.7125,
+      "recorded_at": "2026-09-22T15:42:40.656303+00:00",
+      "auto_executable": [
+        "monitor_account",
+        "warn_customer",
+        "create_fraud_case"
+      ],
+      "requires_approval": [
+        "block_transaction"
+      ]
+    }
+  },
+  "actions_taken": [
+    {
+      "action": "block_transaction",
+      "status": "pending_approval",
+      "approval_route": "l1_analyst",
+      "timestamp": "2026-09-22T15:42:40.656310+00:00",
+      "policy_refs": [
+        "POL-BLK-002"
+      ]
+    },
+    {
+      "action": "monitor_account",
+      "status": "executed",
+      "approval_route": "auto",
+      "timestamp": "2026-09-22T15:42:40.656312+00:00",
+      "policy_refs": [
+        "POL-AUTH-003"
+      ]
+    },
+    {
+      "action": "warn_customer",
+      "status": "executed",
+      "approval_route": "auto",
+      "timestamp": "2026-09-22T15:42:40.656315+00:00",
+      "policy_refs": [
+        "POL-AUTH-003"
+      ]
+    },
+    {
+      "action": "create_fraud_case",
+      "status": "executed",
+      "approval_route": "auto",
+      "timestamp": "2026-09-22T15:42:40.656316+00:00",
+      "policy_refs": [
+        "POL-AUTH-003"
+      ]
+    }
+  ],
+  "sar": {
+    "required": false,
+    "text": null,
+    "regulatory_refs": []
+  },
+  "case_summary": "Case HHG-002 for C11891: Triggered by risk_score on transaction 3478782 ($292.36). Identified Card-Not-Present (CNP) E-Commerce Fraud. NBA resolved to block_transaction.",
+  "reasoning": "Pattern detected (['card_not_present_fraud']) with confidence 71%. Blocking transaction, monitoring account, notifying customer.",
+  "graph_written": true
+}

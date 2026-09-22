@@ -1,0 +1,156 @@
+{
+  "case_id": "HHG-014",
+  "trigger": {
+    "type": "analyst_request",
+    "ref_id": "3478561",
+    "risk_score": 0.7,
+    "amount": 150.0,
+    "reason": "Analyst request: several cards this month show purchases from the same unusual device profile. Review transaction 3478561 on card C13487-K1 and look for related activity."
+  },
+  "investigation_record": {
+    "target": {
+      "entity_type": "Customer",
+      "entity_id": "C13487",
+      "card_id": "C13487-K1"
+    },
+    "evidence_gathered": [
+      {
+        "id": "EV-TXN-01",
+        "source": "graph",
+        "type": "transaction_record",
+        "content": "Transaction 3478561 on Card C13487-K1 for $150.00. Trigger: Analyst request: several cards this month show purchases from the same unusual device profile. Review transaction 3478561 on card C13487-K1 and look for related activity.",
+        "collected_at": "2026-09-22T15:42:40.671697+00:00",
+        "confidence_weight": 0.45
+      },
+      {
+        "id": "EV-HIST-02",
+        "source": "case_memory",
+        "type": "prior_case_lineage",
+        "content": "Customer C13487 has 0 prior recorded cases in TigerGraph memory (0 confirmed fraud, 0 cleared).",
+        "collected_at": "2026-09-22T15:42:40.671810+00:00",
+        "confidence_weight": 0.4
+      },
+      {
+        "id": "EV-AUTH-03",
+        "source": "external_api",
+        "type": "step_up_auth_result",
+        "content": "Step-up 2FA prompt delivered to registered authenticator. Result: TIMED_OUT",
+        "collected_at": "2026-09-22T15:42:40.671843+00:00",
+        "confidence_weight": 0.6
+      }
+    ],
+    "patterns_matched": [
+      {
+        "pattern_id": "out_of_region_use",
+        "name": "Out-of-Region / Device Anomaly",
+        "evidence_refs": [
+          "EV-DEV-03"
+        ],
+        "confidence": 0.79
+      }
+    ],
+    "prior_cases_used": [],
+    "risk_assessment": {
+      "risk_level": "medium",
+      "confidence": 0.7125,
+      "confidence_components": {
+        "graph_support": 0.35,
+        "historical_rate": 0.3,
+        "signal_strength": 0.85,
+        "evidence_coverage": 0.85,
+        "contradiction_penalty": 0.0,
+        "final": 0.5375
+      },
+      "uncertainty_reasons": [
+        "Low historical fraud rate for similar cases",
+        "Incomplete evidence checklist for the suspected fraud typology",
+        "Overall confidence too low to take action without analyst review"
+      ]
+    }
+  },
+  "next_best_action": {
+    "before_additional_evidence": {
+      "primary_action": "monitor_account",
+      "all_actions": [
+        "request_step_up_auth",
+        "monitor_account"
+      ],
+      "approval_route": "auto",
+      "reasoning": "Confidence 43% is below action threshold. Requesting step-up authentication as least-invasive first step.",
+      "confidence_at_time": 0.4325,
+      "recorded_at": "2026-09-22T15:42:40.671826+00:00",
+      "auto_executable": [
+        "request_step_up_auth",
+        "monitor_account"
+      ],
+      "requires_approval": []
+    },
+    "after_additional_evidence": {
+      "primary_action": "block_transaction",
+      "all_actions": [
+        "block_transaction",
+        "monitor_account",
+        "warn_customer",
+        "create_fraud_case"
+      ],
+      "approval_route": "l1_analyst",
+      "reasoning": "Pattern detected (['out_of_region_use']) with confidence 71%. Blocking transaction, monitoring account, notifying customer.",
+      "confidence_at_time": 0.7125,
+      "recorded_at": "2026-09-22T15:42:40.671852+00:00",
+      "auto_executable": [
+        "monitor_account",
+        "warn_customer",
+        "create_fraud_case"
+      ],
+      "requires_approval": [
+        "block_transaction"
+      ]
+    }
+  },
+  "actions_taken": [
+    {
+      "action": "block_transaction",
+      "status": "pending_approval",
+      "approval_route": "l1_analyst",
+      "timestamp": "2026-09-22T15:42:40.671857+00:00",
+      "policy_refs": [
+        "POL-BLK-002"
+      ]
+    },
+    {
+      "action": "monitor_account",
+      "status": "executed",
+      "approval_route": "auto",
+      "timestamp": "2026-09-22T15:42:40.671859+00:00",
+      "policy_refs": [
+        "POL-AUTH-003"
+      ]
+    },
+    {
+      "action": "warn_customer",
+      "status": "executed",
+      "approval_route": "auto",
+      "timestamp": "2026-09-22T15:42:40.671861+00:00",
+      "policy_refs": [
+        "POL-AUTH-003"
+      ]
+    },
+    {
+      "action": "create_fraud_case",
+      "status": "executed",
+      "approval_route": "auto",
+      "timestamp": "2026-09-22T15:42:40.671863+00:00",
+      "policy_refs": [
+        "POL-AUTH-003"
+      ]
+    }
+  ],
+  "sar": {
+    "required": false,
+    "text": null,
+    "regulatory_refs": []
+  },
+  "case_summary": "Case HHG-014 for C13487: Triggered by analyst_request on transaction 3478561 ($150.00). Identified Out-of-Region / Device Anomaly. NBA resolved to block_transaction.",
+  "reasoning": "Pattern detected (['out_of_region_use']) with confidence 71%. Blocking transaction, monitoring account, notifying customer.",
+  "graph_written": true
+}

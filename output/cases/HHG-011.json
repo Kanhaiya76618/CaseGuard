@@ -1,0 +1,192 @@
+{
+  "case_id": "HHG-011",
+  "trigger": {
+    "type": "customer_report",
+    "ref_id": "3583368",
+    "risk_score": 0.7,
+    "amount": 131.3,
+    "reason": "Customer C11923 message: 'I never made this $131.30 purchase. Please check my card.' Refers to 3583368."
+  },
+  "investigation_record": {
+    "target": {
+      "entity_type": "Customer",
+      "entity_id": "C11923",
+      "card_id": "C11923-K2"
+    },
+    "evidence_gathered": [
+      {
+        "id": "EV-TXN-01",
+        "source": "graph",
+        "type": "transaction_record",
+        "content": "Transaction 3583368 on Card C11923-K2 for $131.30. Trigger: Customer C11923 message: 'I never made this $131.30 purchase. Please check my card.' Refers to 3583368.",
+        "collected_at": "2026-09-22T15:42:40.668065+00:00",
+        "confidence_weight": 0.45
+      },
+      {
+        "id": "EV-HIST-02",
+        "source": "case_memory",
+        "type": "prior_case_lineage",
+        "content": "Customer C11923 has 11 prior recorded cases in TigerGraph memory (10 confirmed fraud, 1 cleared).",
+        "collected_at": "2026-09-22T15:42:40.668170+00:00",
+        "confidence_weight": 0.4
+      },
+      {
+        "id": "EV-VAL-03",
+        "source": "external_api",
+        "type": "customer_validation_result",
+        "content": "Customer validation ping for $131.3: Customer reported 'CONFIRMED_LEGITIMATE'",
+        "collected_at": "2026-09-22T15:42:40.668205+00:00",
+        "confidence_weight": 0.65
+      }
+    ],
+    "patterns_matched": [
+      {
+        "pattern_id": "account_takeover",
+        "name": "Account Takeover / Identity Inconsistency",
+        "evidence_refs": [
+          "EV-CUST-01"
+        ],
+        "confidence": 0.75
+      }
+    ],
+    "prior_cases_used": [
+      {
+        "case_id": "CC-0031",
+        "similarity": 0.85,
+        "outcome": "confirmed_fraud",
+        "pattern_id": "card_not_present_new_device",
+        "notes": "Case CC-0031: cardholder C11923 reported unrecognized activity on card C11923-K2. 1 transaction(s) between 2016-07-02 and 2016-07-02 totalin"
+      },
+      {
+        "case_id": "CC-0290",
+        "similarity": 0.85,
+        "outcome": "confirmed_fraud",
+        "pattern_id": "card_testing",
+        "notes": "Case CC-0290: cardholder C11923 reported unrecognized activity on card C11923-K2. 8 transaction(s) between 2016-07-05 and 2016-07-08 totalin"
+      },
+      {
+        "case_id": "CC-1056",
+        "similarity": 0.85,
+        "outcome": "confirmed_fraud",
+        "pattern_id": "card_not_present_new_device",
+        "notes": "Case CC-1056: cardholder C11923 reported unrecognized activity on card C11923-K2. 28 transaction(s) between 2016-07-11 and 2016-07-22 totali"
+      },
+      {
+        "case_id": "CC-2247",
+        "similarity": 0.85,
+        "outcome": "confirmed_fraud",
+        "pattern_id": "card_testing",
+        "notes": "Case CC-2247: cardholder C11923 reported unrecognized activity on card C11923-K2. 71 transaction(s) between 2016-07-25 and 2016-08-16 totali"
+      },
+      {
+        "case_id": "CC-2673",
+        "similarity": 0.85,
+        "outcome": "confirmed_fraud",
+        "pattern_id": "card_testing",
+        "notes": "Case CC-2673: cardholder C11923 reported unrecognized activity on card C11923-K2. 33 transaction(s) between 2016-08-18 and 2016-08-27 totali"
+      }
+    ],
+    "risk_assessment": {
+      "risk_level": "medium",
+      "confidence": 0.7338,
+      "confidence_components": {
+        "graph_support": 0.625,
+        "historical_rate": 0.0,
+        "signal_strength": 0.85,
+        "evidence_coverage": 0.85,
+        "contradiction_penalty": 0.0,
+        "final": 0.5588
+      },
+      "uncertainty_reasons": [
+        "Low historical fraud rate for similar cases",
+        "Incomplete evidence checklist for the suspected fraud typology",
+        "Overall confidence too low to take action without analyst review"
+      ]
+    }
+  },
+  "next_best_action": {
+    "before_additional_evidence": {
+      "primary_action": "monitor_account",
+      "all_actions": [
+        "request_step_up_auth",
+        "monitor_account"
+      ],
+      "approval_route": "auto",
+      "reasoning": "Confidence 45% is below action threshold. Requesting step-up authentication as least-invasive first step.",
+      "confidence_at_time": 0.4537,
+      "recorded_at": "2026-09-22T15:42:40.668187+00:00",
+      "auto_executable": [
+        "request_step_up_auth",
+        "monitor_account"
+      ],
+      "requires_approval": []
+    },
+    "after_additional_evidence": {
+      "primary_action": "block_transaction",
+      "all_actions": [
+        "block_transaction",
+        "monitor_account",
+        "warn_customer",
+        "create_fraud_case"
+      ],
+      "approval_route": "l1_analyst",
+      "reasoning": "Pattern detected (['account_takeover']) with confidence 73%. Blocking transaction, monitoring account, notifying customer.",
+      "confidence_at_time": 0.7338,
+      "recorded_at": "2026-09-22T15:42:40.668215+00:00",
+      "auto_executable": [
+        "monitor_account",
+        "warn_customer",
+        "create_fraud_case"
+      ],
+      "requires_approval": [
+        "block_transaction"
+      ]
+    }
+  },
+  "actions_taken": [
+    {
+      "action": "block_transaction",
+      "status": "pending_approval",
+      "approval_route": "l1_analyst",
+      "timestamp": "2026-09-22T15:42:40.668220+00:00",
+      "policy_refs": [
+        "POL-BLK-002"
+      ]
+    },
+    {
+      "action": "monitor_account",
+      "status": "executed",
+      "approval_route": "auto",
+      "timestamp": "2026-09-22T15:42:40.668222+00:00",
+      "policy_refs": [
+        "POL-AUTH-003"
+      ]
+    },
+    {
+      "action": "warn_customer",
+      "status": "executed",
+      "approval_route": "auto",
+      "timestamp": "2026-09-22T15:42:40.668224+00:00",
+      "policy_refs": [
+        "POL-AUTH-003"
+      ]
+    },
+    {
+      "action": "create_fraud_case",
+      "status": "executed",
+      "approval_route": "auto",
+      "timestamp": "2026-09-22T15:42:40.668226+00:00",
+      "policy_refs": [
+        "POL-AUTH-003"
+      ]
+    }
+  ],
+  "sar": {
+    "required": false,
+    "text": null,
+    "regulatory_refs": []
+  },
+  "case_summary": "Case HHG-011 for C11923: Triggered by customer_report on transaction 3583368 ($131.30). Identified Account Takeover / Identity Inconsistency. NBA resolved to block_transaction.",
+  "reasoning": "Pattern detected (['account_takeover']) with confidence 73%. Blocking transaction, monitoring account, notifying customer.",
+  "graph_written": true
+}

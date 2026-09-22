@@ -1,0 +1,173 @@
+{
+  "case_id": "HHG-001",
+  "trigger": {
+    "type": "risk_score",
+    "ref_id": "3514030",
+    "risk_score": 0.61,
+    "amount": 77.07,
+    "reason": "Real-time model scored transaction 3514030 ($77.07, in billing region 444.0) at 0.61. Review and decide."
+  },
+  "investigation_record": {
+    "target": {
+      "entity_type": "Customer",
+      "entity_id": "C12382",
+      "card_id": "C12382-K1"
+    },
+    "evidence_gathered": [
+      {
+        "id": "EV-TXN-01",
+        "source": "graph",
+        "type": "transaction_record",
+        "content": "Transaction 3514030 on Card C12382-K1 for $77.07. Trigger: Real-time model scored transaction 3514030 ($77.07, in billing region 444.0) at 0.61. Review and decide.",
+        "collected_at": "2026-09-22T15:42:40.654077+00:00",
+        "confidence_weight": 0.45
+      },
+      {
+        "id": "EV-HIST-02",
+        "source": "case_memory",
+        "type": "prior_case_lineage",
+        "content": "Customer C12382 has 4 prior recorded cases in TigerGraph memory (4 confirmed fraud, 0 cleared).",
+        "collected_at": "2026-09-22T15:42:40.654583+00:00",
+        "confidence_weight": 0.4
+      },
+      {
+        "id": "EV-AUTH-03",
+        "source": "external_api",
+        "type": "step_up_auth_result",
+        "content": "Step-up 2FA prompt delivered to registered authenticator. Result: FAILED",
+        "collected_at": "2026-09-22T15:42:40.654681+00:00",
+        "confidence_weight": 0.6
+      }
+    ],
+    "patterns_matched": [
+      {
+        "pattern_id": "out_of_region_use",
+        "name": "Out-of-Region / Device Anomaly",
+        "evidence_refs": [
+          "EV-DEV-03"
+        ],
+        "confidence": 0.79
+      }
+    ],
+    "prior_cases_used": [
+      {
+        "case_id": "CC-1066",
+        "similarity": 0.85,
+        "outcome": "confirmed_fraud",
+        "pattern_id": "out_of_region_use",
+        "notes": "Case CC-1066: cardholder C12382 reported unrecognized activity on card C12382-K1. 1 transaction(s) between 2016-07-23 and 2016-07-23 totalin"
+      },
+      {
+        "case_id": "CC-1673",
+        "similarity": 0.85,
+        "outcome": "confirmed_fraud",
+        "pattern_id": "card_not_present_new_device",
+        "notes": "Case CC-1673: cardholder C12382 reported unrecognized activity on card C12382-K1. 1 transaction(s) between 2016-08-04 and 2016-08-04 totalin"
+      },
+      {
+        "case_id": "CC-2964",
+        "similarity": 0.85,
+        "outcome": "confirmed_fraud",
+        "pattern_id": "out_of_region_use",
+        "notes": "Case CC-2964: cardholder C12382 reported unrecognized activity on card C12382-K1. 1 transaction(s) between 2016-09-01 and 2016-09-01 totalin"
+      },
+      {
+        "case_id": "CC-3587",
+        "similarity": 0.85,
+        "outcome": "confirmed_fraud",
+        "pattern_id": "out_of_region_use",
+        "notes": "Case CC-3587: cardholder C12382 reported unrecognized activity on card C12382-K1. 1 transaction(s) between 2016-09-16 and 2016-09-16 totalin"
+      }
+    ],
+    "risk_assessment": {
+      "risk_level": "medium",
+      "confidence": 0.699,
+      "confidence_components": {
+        "graph_support": 0.59,
+        "historical_rate": 0.0,
+        "signal_strength": 0.76,
+        "evidence_coverage": 0.85,
+        "contradiction_penalty": 0.0,
+        "final": 0.524
+      },
+      "uncertainty_reasons": [
+        "Low historical fraud rate for similar cases",
+        "Incomplete evidence checklist for the suspected fraud typology",
+        "Overall confidence too low to take action without analyst review"
+      ]
+    }
+  },
+  "next_best_action": {
+    "before_additional_evidence": {
+      "primary_action": "monitor_account",
+      "all_actions": [
+        "request_step_up_auth",
+        "monitor_account"
+      ],
+      "approval_route": "auto",
+      "reasoning": "Confidence 42% is below action threshold. Requesting step-up authentication as least-invasive first step.",
+      "confidence_at_time": 0.419,
+      "recorded_at": "2026-09-22T15:42:40.654638+00:00",
+      "auto_executable": [
+        "request_step_up_auth",
+        "monitor_account"
+      ],
+      "requires_approval": []
+    },
+    "after_additional_evidence": {
+      "primary_action": "escalate_to_analyst",
+      "all_actions": [
+        "create_fraud_case",
+        "escalate_to_analyst",
+        "monitor_account"
+      ],
+      "approval_route": "human_queue",
+      "reasoning": "Ambiguous signals (confidence 70%, risk medium). Escalating to analyst for human judgment.",
+      "confidence_at_time": 0.699,
+      "recorded_at": "2026-09-22T15:42:40.654697+00:00",
+      "auto_executable": [
+        "create_fraud_case",
+        "escalate_to_analyst",
+        "monitor_account"
+      ],
+      "requires_approval": []
+    }
+  },
+  "actions_taken": [
+    {
+      "action": "create_fraud_case",
+      "status": "executed",
+      "approval_route": "auto",
+      "timestamp": "2026-09-22T15:42:40.654705+00:00",
+      "policy_refs": [
+        "POL-AUTH-003"
+      ]
+    },
+    {
+      "action": "escalate_to_analyst",
+      "status": "executed",
+      "approval_route": "human_queue",
+      "timestamp": "2026-09-22T15:42:40.654708+00:00",
+      "policy_refs": [
+        "POL-AUTH-003"
+      ]
+    },
+    {
+      "action": "monitor_account",
+      "status": "executed",
+      "approval_route": "auto",
+      "timestamp": "2026-09-22T15:42:40.654711+00:00",
+      "policy_refs": [
+        "POL-AUTH-003"
+      ]
+    }
+  ],
+  "sar": {
+    "required": false,
+    "text": null,
+    "regulatory_refs": []
+  },
+  "case_summary": "Case HHG-001 for C12382: Triggered by risk_score on transaction 3514030 ($77.07). Identified Out-of-Region / Device Anomaly. NBA resolved to escalate_to_analyst.",
+  "reasoning": "Ambiguous signals (confidence 70%, risk medium). Escalating to analyst for human judgment.",
+  "graph_written": true
+}

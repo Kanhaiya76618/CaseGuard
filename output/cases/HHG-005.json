@@ -1,0 +1,167 @@
+{
+  "case_id": "HHG-005",
+  "trigger": {
+    "type": "risk_score",
+    "ref_id": "3523199",
+    "risk_score": 0.54,
+    "amount": 100.07,
+    "reason": "Real-time model scored transaction 3523199 ($100.07, online) at 0.54. Review and decide."
+  },
+  "investigation_record": {
+    "target": {
+      "entity_type": "Customer",
+      "entity_id": "C02923",
+      "card_id": "C02923-K1"
+    },
+    "evidence_gathered": [
+      {
+        "id": "EV-TXN-01",
+        "source": "graph",
+        "type": "transaction_record",
+        "content": "Transaction 3523199 on Card C02923-K1 for $100.07. Trigger: Real-time model scored transaction 3523199 ($100.07, online) at 0.54. Review and decide.",
+        "collected_at": "2026-09-22T15:42:40.660233+00:00",
+        "confidence_weight": 0.45
+      },
+      {
+        "id": "EV-HIST-02",
+        "source": "case_memory",
+        "type": "prior_case_lineage",
+        "content": "Customer C02923 has 3 prior recorded cases in TigerGraph memory (3 confirmed fraud, 0 cleared).",
+        "collected_at": "2026-09-22T15:42:40.660344+00:00",
+        "confidence_weight": 0.4
+      },
+      {
+        "id": "EV-AUTH-03",
+        "source": "external_api",
+        "type": "step_up_auth_result",
+        "content": "Step-up 2FA prompt delivered to registered authenticator. Result: FAILED",
+        "collected_at": "2026-09-22T15:42:40.660381+00:00",
+        "confidence_weight": 0.6
+      }
+    ],
+    "patterns_matched": [
+      {
+        "pattern_id": "card_not_present_fraud",
+        "name": "Card-Not-Present (CNP) E-Commerce Fraud",
+        "evidence_refs": [
+          "EV-GRAPH-01",
+          "EV-TXN-02"
+        ],
+        "confidence": 0.82
+      }
+    ],
+    "prior_cases_used": [
+      {
+        "case_id": "CC-2400",
+        "similarity": 0.85,
+        "outcome": "confirmed_fraud",
+        "pattern_id": "account_takeover",
+        "notes": "Case CC-2400: cardholder C02923 reported unrecognized activity on card C02923-K1. 3 transaction(s) between 2016-08-18 and 2016-08-19 totalin"
+      },
+      {
+        "case_id": "CC-2717",
+        "similarity": 0.85,
+        "outcome": "confirmed_fraud",
+        "pattern_id": "account_takeover",
+        "notes": "Case CC-2717: cardholder C02923 reported unrecognized activity on card C02923-K1. 6 transaction(s) between 2016-08-25 and 2016-08-27 totalin"
+      },
+      {
+        "case_id": "CC-2857",
+        "similarity": 0.85,
+        "outcome": "confirmed_fraud",
+        "pattern_id": "account_takeover",
+        "notes": "Case CC-2857: cardholder C02923 reported unrecognized activity on card C02923-K1. 2 transaction(s) between 2016-08-30 and 2016-08-30 totalin"
+      }
+    ],
+    "risk_assessment": {
+      "risk_level": "medium",
+      "confidence": 0.6763,
+      "confidence_components": {
+        "graph_support": 0.575,
+        "historical_rate": 0.0,
+        "signal_strength": 0.69,
+        "evidence_coverage": 0.85,
+        "contradiction_penalty": 0.0,
+        "final": 0.5012
+      },
+      "uncertainty_reasons": [
+        "Low historical fraud rate for similar cases",
+        "Incomplete evidence checklist for the suspected fraud typology",
+        "Overall confidence too low to take action without analyst review"
+      ]
+    }
+  },
+  "next_best_action": {
+    "before_additional_evidence": {
+      "primary_action": "monitor_account",
+      "all_actions": [
+        "request_step_up_auth",
+        "monitor_account"
+      ],
+      "approval_route": "auto",
+      "reasoning": "Confidence 40% is below action threshold. Requesting step-up authentication as least-invasive first step.",
+      "confidence_at_time": 0.3962,
+      "recorded_at": "2026-09-22T15:42:40.660362+00:00",
+      "auto_executable": [
+        "request_step_up_auth",
+        "monitor_account"
+      ],
+      "requires_approval": []
+    },
+    "after_additional_evidence": {
+      "primary_action": "escalate_to_analyst",
+      "all_actions": [
+        "create_fraud_case",
+        "escalate_to_analyst",
+        "monitor_account"
+      ],
+      "approval_route": "human_queue",
+      "reasoning": "Ambiguous signals (confidence 68%, risk medium). Escalating to analyst for human judgment.",
+      "confidence_at_time": 0.6763,
+      "recorded_at": "2026-09-22T15:42:40.660390+00:00",
+      "auto_executable": [
+        "create_fraud_case",
+        "escalate_to_analyst",
+        "monitor_account"
+      ],
+      "requires_approval": []
+    }
+  },
+  "actions_taken": [
+    {
+      "action": "create_fraud_case",
+      "status": "executed",
+      "approval_route": "auto",
+      "timestamp": "2026-09-22T15:42:40.660395+00:00",
+      "policy_refs": [
+        "POL-AUTH-003"
+      ]
+    },
+    {
+      "action": "escalate_to_analyst",
+      "status": "executed",
+      "approval_route": "human_queue",
+      "timestamp": "2026-09-22T15:42:40.660397+00:00",
+      "policy_refs": [
+        "POL-AUTH-003"
+      ]
+    },
+    {
+      "action": "monitor_account",
+      "status": "executed",
+      "approval_route": "auto",
+      "timestamp": "2026-09-22T15:42:40.660399+00:00",
+      "policy_refs": [
+        "POL-AUTH-003"
+      ]
+    }
+  ],
+  "sar": {
+    "required": false,
+    "text": null,
+    "regulatory_refs": []
+  },
+  "case_summary": "Case HHG-005 for C02923: Triggered by risk_score on transaction 3523199 ($100.07). Identified Card-Not-Present (CNP) E-Commerce Fraud. NBA resolved to escalate_to_analyst.",
+  "reasoning": "Ambiguous signals (confidence 68%, risk medium). Escalating to analyst for human judgment.",
+  "graph_written": true
+}

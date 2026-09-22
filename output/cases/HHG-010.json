@@ -1,0 +1,154 @@
+{
+  "case_id": "HHG-010",
+  "trigger": {
+    "type": "risk_score",
+    "ref_id": "3506725",
+    "risk_score": 0.9,
+    "amount": 1000.03,
+    "reason": "Real-time model scored transaction 3506725 ($1,000.03, online) at 0.90. Review and decide."
+  },
+  "investigation_record": {
+    "target": {
+      "entity_type": "Customer",
+      "entity_id": "C10434",
+      "card_id": "C10434-K1"
+    },
+    "evidence_gathered": [
+      {
+        "id": "EV-TXN-01",
+        "source": "graph",
+        "type": "transaction_record",
+        "content": "Transaction 3506725 on Card C10434-K1 for $1000.03. Trigger: Real-time model scored transaction 3506725 ($1,000.03, online) at 0.90. Review and decide.",
+        "collected_at": "2026-09-22T15:42:40.666832+00:00",
+        "confidence_weight": 0.45
+      },
+      {
+        "id": "EV-HIST-02",
+        "source": "case_memory",
+        "type": "prior_case_lineage",
+        "content": "Customer C10434 has 1 prior recorded cases in TigerGraph memory (0 confirmed fraud, 1 cleared).",
+        "collected_at": "2026-09-22T15:42:40.666942+00:00",
+        "confidence_weight": 0.4
+      },
+      {
+        "id": "EV-AUTH-03",
+        "source": "external_api",
+        "type": "step_up_auth_result",
+        "content": "Step-up 2FA prompt delivered to registered authenticator. Result: SUCCESS",
+        "collected_at": "2026-09-22T15:42:40.666978+00:00",
+        "confidence_weight": 0.6
+      }
+    ],
+    "patterns_matched": [
+      {
+        "pattern_id": "card_not_present_fraud",
+        "name": "Card-Not-Present (CNP) E-Commerce Fraud",
+        "evidence_refs": [
+          "EV-GRAPH-01",
+          "EV-TXN-02"
+        ],
+        "confidence": 0.82
+      }
+    ],
+    "prior_cases_used": [
+      {
+        "case_id": "CC-0873",
+        "similarity": 0.85,
+        "outcome": "cleared",
+        "pattern_id": "none",
+        "notes": "Case CC-0873: model scored a $50.05 transaction at 0.93. Cardholder confirmed travel to the billing region in question. Alert cleared."
+      }
+    ],
+    "risk_assessment": {
+      "risk_level": "medium",
+      "confidence": 0.49,
+      "confidence_components": {
+        "graph_support": 0.5,
+        "historical_rate": 0.0,
+        "signal_strength": 1.0,
+        "evidence_coverage": 0.85,
+        "contradiction_penalty": 0.25,
+        "final": 0.3025
+      },
+      "uncertainty_reasons": [
+        "Low historical fraud rate for similar cases",
+        "Incomplete evidence checklist for the suspected fraud typology",
+        "Activity resembles previously cleared cases \u2014 confidence reduced",
+        "Overall confidence too low to take action without analyst review"
+      ]
+    }
+  },
+  "next_best_action": {
+    "before_additional_evidence": {
+      "primary_action": "monitor_account",
+      "all_actions": [
+        "request_step_up_auth",
+        "monitor_account"
+      ],
+      "approval_route": "auto",
+      "reasoning": "Confidence 21% is below action threshold. Requesting step-up authentication as least-invasive first step.",
+      "confidence_at_time": 0.21,
+      "recorded_at": "2026-09-22T15:42:40.666960+00:00",
+      "auto_executable": [
+        "request_step_up_auth",
+        "monitor_account"
+      ],
+      "requires_approval": []
+    },
+    "after_additional_evidence": {
+      "primary_action": "escalate_to_analyst",
+      "all_actions": [
+        "request_customer_validation",
+        "monitor_account",
+        "escalate_to_analyst"
+      ],
+      "approval_route": "human_queue",
+      "reasoning": "After 1 iteration(s), confidence 49% still insufficient. Escalating with customer validation request and analyst review.",
+      "confidence_at_time": 0.49,
+      "recorded_at": "2026-09-22T15:42:40.666985+00:00",
+      "auto_executable": [
+        "request_customer_validation",
+        "monitor_account",
+        "escalate_to_analyst"
+      ],
+      "requires_approval": []
+    }
+  },
+  "actions_taken": [
+    {
+      "action": "request_customer_validation",
+      "status": "executed",
+      "approval_route": "auto",
+      "timestamp": "2026-09-22T15:42:40.666990+00:00",
+      "policy_refs": [
+        "POL-AUTH-003"
+      ]
+    },
+    {
+      "action": "monitor_account",
+      "status": "executed",
+      "approval_route": "auto",
+      "timestamp": "2026-09-22T15:42:40.666992+00:00",
+      "policy_refs": [
+        "POL-AUTH-003"
+      ]
+    },
+    {
+      "action": "escalate_to_analyst",
+      "status": "executed",
+      "approval_route": "human_queue",
+      "timestamp": "2026-09-22T15:42:40.666994+00:00",
+      "policy_refs": [
+        "POL-AUTH-003"
+      ]
+    }
+  ],
+  "sar": {
+    "required": false,
+    "text": null,
+    "regulatory_refs": []
+  },
+  "case_summary": "Case HHG-010 for C10434: Triggered by risk_score on transaction 3506725 ($1000.03). Identified Card-Not-Present (CNP) E-Commerce Fraud. NBA resolved to escalate_to_analyst.",
+  "reasoning": "After 1 iteration(s), confidence 49% still insufficient. Escalating with customer validation request and analyst review.",
+  "graph_written": true
+}

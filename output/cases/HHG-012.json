@@ -1,0 +1,160 @@
+{
+  "case_id": "HHG-012",
+  "trigger": {
+    "type": "risk_score",
+    "ref_id": "3553342",
+    "risk_score": 0.55,
+    "amount": 30.91,
+    "reason": "Real-time model scored transaction 3553342 ($30.91, in billing region 494.0) at 0.55. Review and decide."
+  },
+  "investigation_record": {
+    "target": {
+      "entity_type": "Customer",
+      "entity_id": "C05876",
+      "card_id": "C05876-K2"
+    },
+    "evidence_gathered": [
+      {
+        "id": "EV-TXN-01",
+        "source": "graph",
+        "type": "transaction_record",
+        "content": "Transaction 3553342 on Card C05876-K2 for $30.91. Trigger: Real-time model scored transaction 3553342 ($30.91, in billing region 494.0) at 0.55. Review and decide.",
+        "collected_at": "2026-09-22T15:42:40.669462+00:00",
+        "confidence_weight": 0.45
+      },
+      {
+        "id": "EV-HIST-02",
+        "source": "case_memory",
+        "type": "prior_case_lineage",
+        "content": "Customer C05876 has 2 prior recorded cases in TigerGraph memory (1 confirmed fraud, 1 cleared).",
+        "collected_at": "2026-09-22T15:42:40.669570+00:00",
+        "confidence_weight": 0.4
+      },
+      {
+        "id": "EV-AUTH-03",
+        "source": "external_api",
+        "type": "step_up_auth_result",
+        "content": "Step-up 2FA prompt delivered to registered authenticator. Result: FAILED",
+        "collected_at": "2026-09-22T15:42:40.669607+00:00",
+        "confidence_weight": 0.6
+      }
+    ],
+    "patterns_matched": [
+      {
+        "pattern_id": "out_of_region_use",
+        "name": "Out-of-Region / Device Anomaly",
+        "evidence_refs": [
+          "EV-DEV-03"
+        ],
+        "confidence": 0.79
+      }
+    ],
+    "prior_cases_used": [
+      {
+        "case_id": "CC-0003",
+        "similarity": 0.85,
+        "outcome": "cleared",
+        "pattern_id": "none",
+        "notes": "Case CC-0003: model scored a $442.92 transaction at 0.91. Cardholder confirmed travel to the billing region in question. Alert cleared."
+      },
+      {
+        "case_id": "CC-2370",
+        "similarity": 0.85,
+        "outcome": "confirmed_fraud",
+        "pattern_id": "card_not_present_fraud",
+        "notes": "Case CC-2370: cardholder C05876 reported unrecognized activity on card C05876-K2. 2 transaction(s) between 2016-08-19 and 2016-08-19 totalin"
+      }
+    ],
+    "risk_assessment": {
+      "risk_level": "medium",
+      "confidence": 0.42,
+      "confidence_components": {
+        "graph_support": 0.55,
+        "historical_rate": 0.0,
+        "signal_strength": 0.7,
+        "evidence_coverage": 0.85,
+        "contradiction_penalty": 0.25,
+        "final": 0.245
+      },
+      "uncertainty_reasons": [
+        "Low historical fraud rate for similar cases",
+        "Incomplete evidence checklist for the suspected fraud typology",
+        "Activity resembles previously cleared cases \u2014 confidence reduced",
+        "Overall confidence too low to take action without analyst review"
+      ]
+    }
+  },
+  "next_best_action": {
+    "before_additional_evidence": {
+      "primary_action": "monitor_account",
+      "all_actions": [
+        "request_step_up_auth",
+        "monitor_account"
+      ],
+      "approval_route": "auto",
+      "reasoning": "Confidence 14% is below action threshold. Requesting step-up authentication as least-invasive first step.",
+      "confidence_at_time": 0.14,
+      "recorded_at": "2026-09-22T15:42:40.669589+00:00",
+      "auto_executable": [
+        "request_step_up_auth",
+        "monitor_account"
+      ],
+      "requires_approval": []
+    },
+    "after_additional_evidence": {
+      "primary_action": "escalate_to_analyst",
+      "all_actions": [
+        "request_customer_validation",
+        "monitor_account",
+        "escalate_to_analyst"
+      ],
+      "approval_route": "human_queue",
+      "reasoning": "After 1 iteration(s), confidence 42% still insufficient. Escalating with customer validation request and analyst review.",
+      "confidence_at_time": 0.42,
+      "recorded_at": "2026-09-22T15:42:40.669614+00:00",
+      "auto_executable": [
+        "request_customer_validation",
+        "monitor_account",
+        "escalate_to_analyst"
+      ],
+      "requires_approval": []
+    }
+  },
+  "actions_taken": [
+    {
+      "action": "request_customer_validation",
+      "status": "executed",
+      "approval_route": "auto",
+      "timestamp": "2026-09-22T15:42:40.669619+00:00",
+      "policy_refs": [
+        "POL-AUTH-003"
+      ]
+    },
+    {
+      "action": "monitor_account",
+      "status": "executed",
+      "approval_route": "auto",
+      "timestamp": "2026-09-22T15:42:40.669622+00:00",
+      "policy_refs": [
+        "POL-AUTH-003"
+      ]
+    },
+    {
+      "action": "escalate_to_analyst",
+      "status": "executed",
+      "approval_route": "human_queue",
+      "timestamp": "2026-09-22T15:42:40.669623+00:00",
+      "policy_refs": [
+        "POL-AUTH-003"
+      ]
+    }
+  ],
+  "sar": {
+    "required": false,
+    "text": null,
+    "regulatory_refs": []
+  },
+  "case_summary": "Case HHG-012 for C05876: Triggered by risk_score on transaction 3553342 ($30.91). Identified Out-of-Region / Device Anomaly. NBA resolved to escalate_to_analyst.",
+  "reasoning": "After 1 iteration(s), confidence 42% still insufficient. Escalating with customer validation request and analyst review.",
+  "graph_written": true
+}
