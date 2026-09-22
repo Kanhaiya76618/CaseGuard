@@ -1,0 +1,169 @@
+{
+  "case_id": "CASE-BENCHMARK-015",
+  "trigger": {
+    "type": "risk_score_alert",
+    "ref_id": "TXN-BENCH-0015",
+    "risk_score": 0.42,
+    "amount": 180.0,
+    "reason": "Routine transaction on new IP"
+  },
+  "investigation_record": {
+    "target": {
+      "entity_type": "Customer",
+      "entity_id": "ID-CUS-1015"
+    },
+    "evidence_gathered": [
+      {
+        "id": "EV-PROF-1",
+        "source": "graph",
+        "type": "customer_profile",
+        "content": "Customer profile: 17 txns ($2350.47), 3 cards, 1 devices.",
+        "collected_at": "2026-09-22T11:43:40.816746+00:00",
+        "confidence_weight": 0.3
+      },
+      {
+        "id": "EV-VEL-2",
+        "source": "graph",
+        "type": "velocity_check",
+        "content": "Card ID-CUS-1015 had 8 txns totaling $1719.75 with avg risk 0.5547",
+        "collected_at": "2026-09-22T11:43:40.816763+00:00",
+        "confidence_weight": 0.4
+      },
+      {
+        "id": "EV-DEV-3",
+        "source": "graph",
+        "type": "device_signal",
+        "content": "Device ID-CUS-1015 linked to 6 cards across 6 customers.",
+        "collected_at": "2026-09-22T11:43:40.816777+00:00",
+        "confidence_weight": 0.45
+      }
+    ],
+    "patterns_matched": [
+      {
+        "pattern_id": "device_sharing",
+        "name": "Device Multi-Accounting / Syndicate Ring",
+        "evidence_refs": [
+          "EV-DEV-3"
+        ],
+        "confidence": 0.85
+      },
+      {
+        "pattern_id": "velocity_burst",
+        "name": "Rapid Transaction Burst",
+        "evidence_refs": [
+          "EV-VEL-2"
+        ],
+        "confidence": 0.78
+      },
+      {
+        "pattern_id": "mule_chain",
+        "name": "Multi-hop Mule Pass-Through Flow",
+        "evidence_refs": [
+          "EV-MULE-1"
+        ],
+        "confidence": 0.88
+      }
+    ],
+    "prior_cases_used": [
+      {
+        "case_id": "CASE-HIST-084",
+        "similarity": 0.82,
+        "outcome": "fraud",
+        "pattern_id": "device_sharing"
+      },
+      {
+        "case_id": "CASE-HIST-112",
+        "similarity": 0.76,
+        "outcome": "fraud",
+        "pattern_id": "velocity_burst"
+      },
+      {
+        "case_id": "CASE-HIST-023",
+        "similarity": 0.58,
+        "outcome": "cleared",
+        "pattern_id": null
+      }
+    ],
+    "risk_assessment": {
+      "risk_level": "medium",
+      "confidence": 0.3963703703703703,
+      "confidence_components": {
+        "graph_support": 0.55,
+        "historical_rate": 0.7315,
+        "signal_strength": 0.42,
+        "evidence_coverage": 0.6,
+        "contradiction_penalty": 0.174,
+        "final": 0.3964
+      },
+      "uncertainty_reasons": [
+        "Moderate risk score \u2014 could be legitimate unusual transaction",
+        "Activity resembles previously cleared cases \u2014 confidence reduced",
+        "Overall confidence too low to take action without analyst review"
+      ]
+    }
+  },
+  "next_best_action": {
+    "before_additional_evidence": {
+      "primary_action": "monitor_account",
+      "all_actions": [
+        "request_step_up_auth",
+        "monitor_account"
+      ],
+      "approval_route": "auto",
+      "reasoning": "Confidence 40% is below action threshold. Requesting step-up authentication as least-invasive first step.",
+      "confidence_at_time": 0.3964,
+      "recorded_at": "2026-09-22T11:43:40.816840+00:00",
+      "auto_executable": [
+        "request_step_up_auth",
+        "monitor_account"
+      ],
+      "requires_approval": []
+    },
+    "after_additional_evidence": {
+      "primary_action": "monitor_account",
+      "all_actions": [
+        "request_step_up_auth",
+        "monitor_account"
+      ],
+      "approval_route": "auto",
+      "reasoning": "Confidence 40% is below action threshold. Requesting step-up authentication as least-invasive first step.",
+      "confidence_at_time": 0.3964,
+      "recorded_at": "2026-09-22T11:43:40.816867+00:00",
+      "auto_executable": [
+        "request_step_up_auth",
+        "monitor_account"
+      ],
+      "requires_approval": []
+    }
+  },
+  "actions_taken": [
+    {
+      "action": "request_step_up_auth",
+      "status": "executed",
+      "approval_route": "auto",
+      "timestamp": "2026-09-22T11:43:40.816861+00:00",
+      "policy_refs": [
+        "POL-AUTH-003"
+      ]
+    },
+    {
+      "action": "monitor_account",
+      "status": "executed",
+      "approval_route": "auto",
+      "timestamp": "2026-09-22T11:43:40.816863+00:00",
+      "policy_refs": [
+        "POL-AUTH-003"
+      ]
+    }
+  ],
+  "sar": {
+    "required": true,
+    "text": "\nSUSPICIOUS ACTIVITY REPORT (SAR) - NARRATIVE\nCase ID: CASE-BENCHMARK-015\nFiling Date: 2026-09-22 11:43 UTC\nSubject ID / Primary Target: ID-CUS-1015\nTotal Suspicious Volume: $180.00\n\n1. REGULATORY BASIS:\n - BSA/AML Policy \u00a75.1: SAR required for money movement patterns\n\n2. NATURE OF SUSPICIOUS ACTIVITY:\n - Moderate risk score \u2014 could be legitimate unusual transaction\n - Activity resembles previously cleared cases \u2014 confidence reduced\n - Overall confidence too low to take action without analyst review\n\n3. CHRONOLOGICAL EVIDENCE TRAIL:\n- customer_profile: Customer profile: 17 txns ($2350.47), 3 cards, 1 devices.\n- velocity_check: Card ID-CUS-1015 had 8 txns totaling $1719.75 with avg risk 0.5547\n- device_signal: Device ID-CUS-1015 linked to 6 cards across 6 customers.\n\n4. NEXT BEST ACTIONS & DISPOSITION:\nThe automated CaseGuard agent, in accordance with institution risk thresholds and human compliance review, \nhas placed a preventative lock on associated accounts and escalated this dossier for FinCEN transmission.\n",
+    "regulatory_refs": [
+      "BSA/AML Policy \u00a75.1: SAR required for money movement patterns"
+    ]
+  },
+  "case_summary": "Case CASE-BENCHMARK-015 concluded with risk level medium and confidence 39.6%. Matched 3 typologies. Actions assigned: ['request_step_up_auth', 'monitor_account'].",
+  "reasoning": "Confidence 40% is below action threshold. Requesting step-up authentication as least-invasive first step.",
+  "graph_written": true
+}

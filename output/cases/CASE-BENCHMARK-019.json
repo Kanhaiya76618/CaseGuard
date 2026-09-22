@@ -1,0 +1,162 @@
+{
+  "case_id": "CASE-BENCHMARK-019",
+  "trigger": {
+    "type": "risk_score_alert",
+    "ref_id": "TXN-BENCH-0019",
+    "risk_score": 0.92,
+    "amount": 8500.0,
+    "reason": "Potential pass-through mule layering"
+  },
+  "investigation_record": {
+    "target": {
+      "entity_type": "Account",
+      "entity_id": "ID-ACC-1019"
+    },
+    "evidence_gathered": [
+      {
+        "id": "EV-PROF-1",
+        "source": "graph",
+        "type": "customer_profile",
+        "content": "Customer profile: 5 txns ($1761.67), 1 cards, 2 devices.",
+        "collected_at": "2026-09-22T11:43:40.821127+00:00",
+        "confidence_weight": 0.3
+      },
+      {
+        "id": "EV-VEL-2",
+        "source": "graph",
+        "type": "velocity_check",
+        "content": "Card ID-ACC-1019 had 1 txns totaling $146.89 with avg risk 0.8859",
+        "collected_at": "2026-09-22T11:43:40.821143+00:00",
+        "confidence_weight": 0.4
+      },
+      {
+        "id": "EV-DEV-3",
+        "source": "graph",
+        "type": "device_signal",
+        "content": "Device ID-ACC-1019 linked to 1 cards across 1 customers.",
+        "collected_at": "2026-09-22T11:43:40.821158+00:00",
+        "confidence_weight": 0.45
+      }
+    ],
+    "patterns_matched": [
+      {
+        "pattern_id": "velocity_burst",
+        "name": "Rapid Transaction Burst",
+        "evidence_refs": [
+          "EV-VEL-2"
+        ],
+        "confidence": 0.78
+      },
+      {
+        "pattern_id": "mule_chain",
+        "name": "Multi-hop Mule Pass-Through Flow",
+        "evidence_refs": [
+          "EV-MULE-1"
+        ],
+        "confidence": 0.88
+      }
+    ],
+    "prior_cases_used": [
+      {
+        "case_id": "CASE-HIST-084",
+        "similarity": 0.82,
+        "outcome": "fraud",
+        "pattern_id": "device_sharing"
+      },
+      {
+        "case_id": "CASE-HIST-112",
+        "similarity": 0.76,
+        "outcome": "fraud",
+        "pattern_id": "velocity_burst"
+      },
+      {
+        "case_id": "CASE-HIST-023",
+        "similarity": 0.58,
+        "outcome": "cleared",
+        "pattern_id": null
+      }
+    ],
+    "risk_assessment": {
+      "risk_level": "medium",
+      "confidence": 0.4913703703703704,
+      "confidence_components": {
+        "graph_support": 0.55,
+        "historical_rate": 0.7315,
+        "signal_strength": 0.92,
+        "evidence_coverage": 0.4,
+        "contradiction_penalty": 0.174,
+        "final": 0.4914
+      },
+      "uncertainty_reasons": [
+        "Incomplete evidence checklist for the suspected fraud typology",
+        "Activity resembles previously cleared cases \u2014 confidence reduced",
+        "Overall confidence too low to take action without analyst review"
+      ]
+    }
+  },
+  "next_best_action": {
+    "before_additional_evidence": {
+      "primary_action": "monitor_account",
+      "all_actions": [
+        "request_step_up_auth",
+        "monitor_account"
+      ],
+      "approval_route": "auto",
+      "reasoning": "Confidence 49% is below action threshold. Requesting step-up authentication as least-invasive first step.",
+      "confidence_at_time": 0.4914,
+      "recorded_at": "2026-09-22T11:43:40.821222+00:00",
+      "auto_executable": [
+        "request_step_up_auth",
+        "monitor_account"
+      ],
+      "requires_approval": []
+    },
+    "after_additional_evidence": {
+      "primary_action": "monitor_account",
+      "all_actions": [
+        "request_step_up_auth",
+        "monitor_account"
+      ],
+      "approval_route": "auto",
+      "reasoning": "Confidence 49% is below action threshold. Requesting step-up authentication as least-invasive first step.",
+      "confidence_at_time": 0.4914,
+      "recorded_at": "2026-09-22T11:43:40.821248+00:00",
+      "auto_executable": [
+        "request_step_up_auth",
+        "monitor_account"
+      ],
+      "requires_approval": []
+    }
+  },
+  "actions_taken": [
+    {
+      "action": "request_step_up_auth",
+      "status": "executed",
+      "approval_route": "auto",
+      "timestamp": "2026-09-22T11:43:40.821242+00:00",
+      "policy_refs": [
+        "POL-AUTH-003"
+      ]
+    },
+    {
+      "action": "monitor_account",
+      "status": "executed",
+      "approval_route": "auto",
+      "timestamp": "2026-09-22T11:43:40.821245+00:00",
+      "policy_refs": [
+        "POL-AUTH-003"
+      ]
+    }
+  ],
+  "sar": {
+    "required": true,
+    "text": "\nSUSPICIOUS ACTIVITY REPORT (SAR) - NARRATIVE\nCase ID: CASE-BENCHMARK-019\nFiling Date: 2026-09-22 11:43 UTC\nSubject ID / Primary Target: ID-ACC-1019\nTotal Suspicious Volume: $8,500.00\n\n1. REGULATORY BASIS:\n - 31 CFR 1020.320: SAR required for transactions \u2265 $5,000 with suspicious activity\n - BSA/AML Policy \u00a75.1: SAR required for money movement patterns\n\n2. NATURE OF SUSPICIOUS ACTIVITY:\n - Incomplete evidence checklist for the suspected fraud typology\n - Activity resembles previously cleared cases \u2014 confidence reduced\n - Overall confidence too low to take action without analyst review\n\n3. CHRONOLOGICAL EVIDENCE TRAIL:\n- customer_profile: Customer profile: 5 txns ($1761.67), 1 cards, 2 devices.\n- velocity_check: Card ID-ACC-1019 had 1 txns totaling $146.89 with avg risk 0.8859\n- device_signal: Device ID-ACC-1019 linked to 1 cards across 1 customers.\n\n4. NEXT BEST ACTIONS & DISPOSITION:\nThe automated CaseGuard agent, in accordance with institution risk thresholds and human compliance review, \nhas placed a preventative lock on associated accounts and escalated this dossier for FinCEN transmission.\n",
+    "regulatory_refs": [
+      "31 CFR 1020.320: SAR required for transactions \u2265 $5,000 with suspicious activity",
+      "BSA/AML Policy \u00a75.1: SAR required for money movement patterns"
+    ]
+  },
+  "case_summary": "Case CASE-BENCHMARK-019 concluded with risk level medium and confidence 49.1%. Matched 2 typologies. Actions assigned: ['request_step_up_auth', 'monitor_account'].",
+  "reasoning": "Confidence 49% is below action threshold. Requesting step-up authentication as least-invasive first step.",
+  "graph_written": true
+}

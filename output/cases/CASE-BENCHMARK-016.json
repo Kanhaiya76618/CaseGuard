@@ -1,0 +1,208 @@
+{
+  "case_id": "CASE-BENCHMARK-016",
+  "trigger": {
+    "type": "risk_score_alert",
+    "ref_id": "TXN-BENCH-0016",
+    "risk_score": 0.88,
+    "amount": 6200.0,
+    "reason": "High-risk device velocity trigger"
+  },
+  "investigation_record": {
+    "target": {
+      "entity_type": "Device",
+      "entity_id": "ID-DEV-1016"
+    },
+    "evidence_gathered": [
+      {
+        "id": "EV-PROF-1",
+        "source": "graph",
+        "type": "customer_profile",
+        "content": "Customer profile: 27 txns ($2874.38), 1 cards, 3 devices.",
+        "collected_at": "2026-09-22T11:43:40.817705+00:00",
+        "confidence_weight": 0.3
+      },
+      {
+        "id": "EV-VEL-2",
+        "source": "graph",
+        "type": "velocity_check",
+        "content": "Card ID-DEV-1016 had 12 txns totaling $2405.99 with avg risk 0.651",
+        "collected_at": "2026-09-22T11:43:40.817722+00:00",
+        "confidence_weight": 0.4
+      },
+      {
+        "id": "EV-DEV-3",
+        "source": "graph",
+        "type": "device_signal",
+        "content": "Device ID-DEV-1016 linked to 6 cards across 5 customers.",
+        "collected_at": "2026-09-22T11:43:40.817736+00:00",
+        "confidence_weight": 0.45
+      },
+      {
+        "id": "EV-AUTH-4",
+        "source": "external",
+        "type": "step_up_auth_result",
+        "content": "Step-up 2FA prompt delivered to registered authenticator. Result: FAILED",
+        "collected_at": "2026-09-22T11:43:40.818273+00:00",
+        "confidence_weight": 0.6
+      },
+      {
+        "id": "EV-VAL-5",
+        "source": "external",
+        "type": "customer_validation_result",
+        "content": "Customer validation ping for $450.0: Customer reported 'CONFIRMED_LEGITIMATE'",
+        "collected_at": "2026-09-22T11:43:40.818291+00:00",
+        "confidence_weight": 0.75
+      }
+    ],
+    "patterns_matched": [
+      {
+        "pattern_id": "device_sharing",
+        "name": "Device Multi-Accounting / Syndicate Ring",
+        "evidence_refs": [
+          "EV-DEV-3"
+        ],
+        "confidence": 0.85
+      },
+      {
+        "pattern_id": "velocity_burst",
+        "name": "Rapid Transaction Burst",
+        "evidence_refs": [
+          "EV-VEL-2"
+        ],
+        "confidence": 0.78
+      },
+      {
+        "pattern_id": "mule_chain",
+        "name": "Multi-hop Mule Pass-Through Flow",
+        "evidence_refs": [
+          "EV-MULE-1"
+        ],
+        "confidence": 0.88
+      }
+    ],
+    "prior_cases_used": [
+      {
+        "case_id": "CASE-HIST-084",
+        "similarity": 0.82,
+        "outcome": "fraud",
+        "pattern_id": "device_sharing"
+      },
+      {
+        "case_id": "CASE-HIST-112",
+        "similarity": 0.76,
+        "outcome": "fraud",
+        "pattern_id": "velocity_burst"
+      },
+      {
+        "case_id": "CASE-HIST-023",
+        "similarity": 0.58,
+        "outcome": "cleared",
+        "pattern_id": null
+      }
+    ],
+    "risk_assessment": {
+      "risk_level": "medium",
+      "confidence": 0.5113703703703703,
+      "confidence_components": {
+        "graph_support": 0.55,
+        "historical_rate": 0.7315,
+        "signal_strength": 0.88,
+        "evidence_coverage": 0.6,
+        "contradiction_penalty": 0.174,
+        "final": 0.5114
+      },
+      "uncertainty_reasons": [
+        "Activity resembles previously cleared cases \u2014 confidence reduced"
+      ]
+    }
+  },
+  "next_best_action": {
+    "before_additional_evidence": {
+      "primary_action": "monitor_account",
+      "all_actions": [
+        "create_fraud_case",
+        "request_step_up_auth",
+        "monitor_account"
+      ],
+      "approval_route": "auto",
+      "reasoning": "Confidence 51% is below action threshold. Requesting step-up authentication as least-invasive first step.",
+      "confidence_at_time": 0.5114,
+      "recorded_at": "2026-09-22T11:43:40.817798+00:00",
+      "auto_executable": [
+        "create_fraud_case",
+        "request_step_up_auth",
+        "monitor_account"
+      ],
+      "requires_approval": []
+    },
+    "after_additional_evidence": {
+      "primary_action": "escalate_to_analyst",
+      "all_actions": [
+        "create_fraud_case",
+        "request_customer_validation",
+        "monitor_account",
+        "escalate_to_analyst"
+      ],
+      "approval_route": "human_queue",
+      "reasoning": "After 1 iteration(s), confidence 51% still insufficient. Escalating with customer validation request and analyst review.",
+      "confidence_at_time": 0.5114,
+      "recorded_at": "2026-09-22T11:43:40.818311+00:00",
+      "auto_executable": [
+        "create_fraud_case",
+        "request_customer_validation",
+        "monitor_account",
+        "escalate_to_analyst"
+      ],
+      "requires_approval": []
+    }
+  },
+  "actions_taken": [
+    {
+      "action": "create_fraud_case",
+      "status": "executed",
+      "approval_route": "auto",
+      "timestamp": "2026-09-22T11:43:40.818334+00:00",
+      "policy_refs": [
+        "POL-AUTH-003"
+      ]
+    },
+    {
+      "action": "request_customer_validation",
+      "status": "executed",
+      "approval_route": "auto",
+      "timestamp": "2026-09-22T11:43:40.818337+00:00",
+      "policy_refs": [
+        "POL-AUTH-003"
+      ]
+    },
+    {
+      "action": "monitor_account",
+      "status": "executed",
+      "approval_route": "auto",
+      "timestamp": "2026-09-22T11:43:40.818339+00:00",
+      "policy_refs": [
+        "POL-AUTH-003"
+      ]
+    },
+    {
+      "action": "escalate_to_analyst",
+      "status": "executed",
+      "approval_route": "human_queue",
+      "timestamp": "2026-09-22T11:43:40.818340+00:00",
+      "policy_refs": [
+        "POL-AUTH-003"
+      ]
+    }
+  ],
+  "sar": {
+    "required": true,
+    "text": "\nSUSPICIOUS ACTIVITY REPORT (SAR) - NARRATIVE\nCase ID: CASE-BENCHMARK-016\nFiling Date: 2026-09-22 11:43 UTC\nSubject ID / Primary Target: ID-DEV-1016\nTotal Suspicious Volume: $6,200.00\n\n1. REGULATORY BASIS:\n - 31 CFR 1020.320: SAR required for transactions \u2265 $5,000 with suspicious activity\n - BSA/AML Policy \u00a75.1: SAR required for money movement patterns\n\n2. NATURE OF SUSPICIOUS ACTIVITY:\n - Activity resembles previously cleared cases \u2014 confidence reduced\n\n3. CHRONOLOGICAL EVIDENCE TRAIL:\n- customer_profile: Customer profile: 27 txns ($2874.38), 1 cards, 3 devices.\n- velocity_check: Card ID-DEV-1016 had 12 txns totaling $2405.99 with avg risk 0.651\n- device_signal: Device ID-DEV-1016 linked to 6 cards across 5 customers.\n- step_up_auth_result: Step-up 2FA prompt delivered to registered authenticator. Result: FAILED\n\n4. NEXT BEST ACTIONS & DISPOSITION:\nThe automated CaseGuard agent, in accordance with institution risk thresholds and human compliance review, \nhas placed a preventative lock on associated accounts and escalated this dossier for FinCEN transmission.\n",
+    "regulatory_refs": [
+      "31 CFR 1020.320: SAR required for transactions \u2265 $5,000 with suspicious activity",
+      "BSA/AML Policy \u00a75.1: SAR required for money movement patterns"
+    ]
+  },
+  "case_summary": "Case CASE-BENCHMARK-016 concluded with risk level medium and confidence 51.1%. Matched 3 typologies. Actions assigned: ['create_fraud_case', 'request_customer_validation', 'monitor_account', 'escalate_to_analyst'].",
+  "reasoning": "After 1 iteration(s), confidence 51% still insufficient. Escalating with customer validation request and analyst review.",
+  "graph_written": true
+}
