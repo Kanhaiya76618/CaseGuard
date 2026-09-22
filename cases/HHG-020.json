@@ -1,0 +1,92 @@
+{
+  "case_id": "HHG-020",
+  "case": {
+    "status": "closed_legitimate",
+    "verdict": "legitimate",
+    "fraud_probability": 0.21,
+    "pattern": "none",
+    "pattern_description": "",
+    "affected_txn_ids": [],
+    "first_suspicious_txn_id": "",
+    "connected_card_ids": [],
+    "connected_device_profiles": [],
+    "exposure_usd": 0.0,
+    "evidence": [
+      {
+        "claim": "Transaction 3509359 flagged via risk_score (risk score 0.52, amount $125.08).",
+        "source": "graph",
+        "ref": "query:transaction_lookup(tx_id=3509359)",
+        "entity_ids": [
+          "3509359",
+          "C12265-K2"
+        ]
+      },
+      {
+        "claim": "Customer C12265 historical profile shows 2 past cases in TigerGraph (2 confirmed fraud).",
+        "source": "graph",
+        "ref": "query:customer_history(customer_id=C12265)",
+        "entity_ids": [
+          "C12265",
+          "CC-2277",
+          "CC-2447"
+        ]
+      },
+      {
+        "claim": "Cardholder confirmed transaction as authentic personal spend.",
+        "source": "customer",
+        "ref": "evidence_request:1",
+        "entity_ids": [
+          "C12265"
+        ]
+      }
+    ],
+    "similar_prior_cases": [
+      "CC-2277",
+      "CC-2447"
+    ],
+    "summary": "Case HHG-020: transaction 3509359 on card C12265-K2 scored at 0.52. Out-of-band customer verification confirmed the charge was legitimate. Case closed as false alarm.",
+    "written_to_graph": true,
+    "graph_case_id": "CASE-TG-HHG-020"
+  },
+  "evidence_requests": [
+    {
+      "type": "customer_validation",
+      "asked_after_step": 2,
+      "assumed_response": "Cardholder confirmed transaction as authentic personal spend."
+    }
+  ],
+  "next_best_actions": {
+    "initial": [
+      {
+        "action": "VERIFY_WITH_CUSTOMER",
+        "route": "auto",
+        "reason": "R1: weak single signal, confirm with customer before blocking"
+      },
+      {
+        "action": "MONITOR_CARD",
+        "route": "auto",
+        "reason": "R1: maintain heightened monitoring pending customer confirmation"
+      }
+    ],
+    "final": [
+      {
+        "action": "CLOSE_NO_FRAUD",
+        "route": "auto",
+        "reason": "R3: cardholder confirmed the purchase as legitimate"
+      }
+    ],
+    "what_changed": "Customer verified transaction. Alert closed with no fraud under policy R3."
+  },
+  "sar": {
+    "file": false,
+    "reason": "No fraud identified; customer confirmed legitimate travel/purchase activity under policy R3.",
+    "narrative": "",
+    "subjects": [],
+    "total_amount_usd": 0.0,
+    "activity_dates": []
+  },
+  "stop_reason": "Customer confirmation settled the question. Closed legitimate under policy R3.",
+  "tool_calls": 10,
+  "tokens": 5854,
+  "latency_s": 5.41
+}

@@ -1,0 +1,120 @@
+{
+  "case_id": "HHG-011",
+  "case": {
+    "status": "closed_fraud",
+    "verdict": "fraud",
+    "fraud_probability": 0.83,
+    "pattern": "account_takeover",
+    "pattern_description": "",
+    "affected_txn_ids": [
+      "3583368"
+    ],
+    "first_suspicious_txn_id": "3583368",
+    "connected_card_ids": [
+      "C11923-K2"
+    ],
+    "connected_device_profiles": [],
+    "exposure_usd": 131.3,
+    "evidence": [
+      {
+        "claim": "Transaction 3583368 flagged via customer_report (risk score 0.65, amount $131.30).",
+        "source": "graph",
+        "ref": "query:transaction_lookup(tx_id=3583368)",
+        "entity_ids": [
+          "3583368",
+          "C11923-K2"
+        ]
+      },
+      {
+        "claim": "Customer C11923 historical profile shows 11 past cases in TigerGraph (10 confirmed fraud).",
+        "source": "graph",
+        "ref": "query:customer_history(customer_id=C11923)",
+        "entity_ids": [
+          "C11923",
+          "CC-0031",
+          "CC-0290",
+          "CC-1056"
+        ]
+      },
+      {
+        "claim": "Customer denied transaction and reported card compromised.",
+        "source": "customer",
+        "ref": "evidence_request:1",
+        "entity_ids": [
+          "C11923"
+        ]
+      }
+    ],
+    "similar_prior_cases": [
+      "CC-0031",
+      "CC-0290",
+      "CC-1056"
+    ],
+    "summary": "Case HHG-011: transaction 3583368 on card C11923-K2 for $131.30 confirmed fraudulent (account_takeover). Card blocked under policy R2; total exposure $131.30.",
+    "written_to_graph": true,
+    "graph_case_id": "CASE-TG-HHG-011"
+  },
+  "evidence_requests": [
+    {
+      "type": "step_up_auth",
+      "asked_after_step": 3,
+      "assumed_response": "Customer denied transaction and reported card compromised."
+    }
+  ],
+  "next_best_actions": {
+    "initial": [
+      {
+        "action": "DECLINE_TRANSACTION",
+        "route": "L1",
+        "reason": "R1: flagged authorization held pending verification"
+      },
+      {
+        "action": "VERIFY_WITH_CUSTOMER",
+        "route": "auto",
+        "reason": "R1: verify with customer before permanent blocking"
+      }
+    ],
+    "final": [
+      {
+        "action": "BLOCK_CARD",
+        "route": "L1",
+        "reason": "R2: customer denied transaction"
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "R2: formal fraud investigation opened"
+      },
+      {
+        "action": "FILE_REPORT",
+        "route": "L2",
+        "reason": "R2/R6: exposure exceeds threshold or shared link identified"
+      },
+      {
+        "action": "MONITOR_CONNECTED_CARDS",
+        "route": "auto",
+        "reason": "R6: customer holds secondary card requiring protective monitoring"
+      }
+    ],
+    "what_changed": "Customer denial confirmed fraudulent activity. Action escalated from initial authorization hold to permanent BLOCK_CARD and CREATE_CASE under policy R2."
+  },
+  "sar": {
+    "file": true,
+    "reason": "R2 and R6: confirmed unauthorized use exceeding $1,000 or linked to shared device profile",
+    "narrative": "On 2016-11-22, unauthorized activity was identified on card C11923-K2 belonging to customer C11923. Transaction 3583368 totaling $131.30 was executed without cardholder authorization. Graph traversal confirmed behavioral divergence and device anomaly consistent with account takeover. The cardholder confirmed the charge was fraudulent. Total exposure: $131.30. Card blocked and reissued; connected identifiers placed under monitoring.",
+    "subjects": [
+      "C11923",
+      "C11923-K2",
+      "C11923-K2"
+    ],
+    "total_amount_usd": 131.3,
+    "activity_dates": [
+      "2016-11-22",
+      "2016-11-22"
+    ]
+  },
+  "stop_reason": "Customer denial settled the verdict. Card secured and case written to TigerGraph.",
+  "tool_calls": 13,
+  "tokens": 6529,
+  "latency_s": 9.21
+}

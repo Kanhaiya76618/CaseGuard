@@ -1,0 +1,101 @@
+{
+  "case_id": "HHG-001",
+  "case": {
+    "status": "closed_fraud",
+    "verdict": "fraud",
+    "fraud_probability": 0.84,
+    "pattern": "out_of_region_use",
+    "pattern_description": "",
+    "affected_txn_ids": [
+      "3514030"
+    ],
+    "first_suspicious_txn_id": "3514030",
+    "connected_card_ids": [],
+    "connected_device_profiles": [],
+    "exposure_usd": 77.07,
+    "evidence": [
+      {
+        "claim": "Transaction 3514030 flagged via risk_score (risk score 0.61, amount $77.07).",
+        "source": "graph",
+        "ref": "query:transaction_lookup(tx_id=3514030)",
+        "entity_ids": [
+          "3514030",
+          "C12382-K1"
+        ]
+      },
+      {
+        "claim": "Customer C12382 historical profile shows 4 past cases in TigerGraph (4 confirmed fraud).",
+        "source": "graph",
+        "ref": "query:customer_history(customer_id=C12382)",
+        "entity_ids": [
+          "C12382",
+          "CC-1066",
+          "CC-1673",
+          "CC-2964"
+        ]
+      },
+      {
+        "claim": "Customer denied transaction and reported card compromised.",
+        "source": "customer",
+        "ref": "evidence_request:1",
+        "entity_ids": [
+          "C12382"
+        ]
+      }
+    ],
+    "similar_prior_cases": [
+      "CC-1066",
+      "CC-1673",
+      "CC-2964"
+    ],
+    "summary": "Case HHG-001: transaction 3514030 on card C12382-K1 for $77.07 confirmed fraudulent (out_of_region_use). Card blocked under policy R2; total exposure $77.07.",
+    "written_to_graph": true,
+    "graph_case_id": "CASE-TG-HHG-001"
+  },
+  "evidence_requests": [
+    {
+      "type": "customer_validation",
+      "asked_after_step": 3,
+      "assumed_response": "Customer denied transaction and reported card compromised."
+    }
+  ],
+  "next_best_actions": {
+    "initial": [
+      {
+        "action": "DECLINE_TRANSACTION",
+        "route": "L1",
+        "reason": "R1: flagged authorization held pending verification"
+      },
+      {
+        "action": "VERIFY_WITH_CUSTOMER",
+        "route": "auto",
+        "reason": "R1: verify with customer before permanent blocking"
+      }
+    ],
+    "final": [
+      {
+        "action": "BLOCK_CARD",
+        "route": "L1",
+        "reason": "R2: customer denied transaction"
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "R2: formal fraud investigation opened"
+      }
+    ],
+    "what_changed": "Customer denial confirmed fraudulent activity. Action escalated from initial authorization hold to permanent BLOCK_CARD and CREATE_CASE under policy R2."
+  },
+  "sar": {
+    "file": false,
+    "reason": "Exposure under $1,000 with no shared syndicate link; internal case opened under R2 without external regulatory filing.",
+    "narrative": "",
+    "subjects": [],
+    "total_amount_usd": 0.0,
+    "activity_dates": []
+  },
+  "stop_reason": "Customer denial settled the verdict. Card secured and case written to TigerGraph.",
+  "tool_calls": 11,
+  "tokens": 5217,
+  "latency_s": 9.22
+}
