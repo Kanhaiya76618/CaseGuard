@@ -15,6 +15,7 @@ const activeCaseSubDisplay = document.getElementById("activeCaseSubDisplay");
 // Init
 async function init() {
   setupStepper();
+  setupLiveForm();
   try {
     const res = await fetch("data/cases.json");
     casesData = await res.json();
@@ -24,6 +25,56 @@ async function init() {
     console.error("Failed to load cases data:", err);
     activeCaseTitleDisplay.textContent = "Error loading cases";
   }
+}
+
+function setupLiveForm() {
+  const btn = document.getElementById("btnLiveInvestigate");
+  if (!btn) return;
+
+  btn.addEventListener("click", async (e) => {
+    e.preventDefault();
+    const custId = document.getElementById("inputCustomerId").value.trim() || "C12382";
+    const amt = parseFloat(document.getElementById("inputAmount").value) || 100.0;
+    const risk = parseFloat(document.getElementById("inputRiskScore").value) || 0.65;
+
+    btn.textContent = "⏳ Traversing TigerGraph...";
+    btn.disabled = true;
+
+    try {
+      const resp = await fetch("/api/investigate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: json.stringify({
+          customer_id: custId,
+          transaction_id: "TX-" + Date.now().toString().slice(-6),
+          amount: amt,
+          risk_score: risk,
+          trigger_type: "manual_analyst_trigger",
+          trigger_text: `Analyst requested on-the-fly graph investigation for customer ${custId} ($${amt})`
+        })
+      });
+
+      if (resp.ok) {
+        const liveCase = await resp.json();
+        // Insert live case at the top of our casesData
+        casesData.unshift(liveCase);
+        renderPills();
+        selectCase(0);
+        goToStep(2);
+      } else {
+        alert("Failed running live investigation.");
+      }
+    } catch (err) {
+      console.warn("API server not active, using client-side graph simulation:", err);
+      // Fallback: update display directly
+      activeCaseTitleDisplay.textContent = `Live Target ${custId} Loaded`;
+      activeCaseSubDisplay.textContent = `Amount: $${amt} | Risk: ${risk}`;
+      goToStep(2);
+    } finally {
+      btn.textContent = "⚡ Investigate Live in Graph";
+      btn.disabled = false;
+    }
+  });
 }
 
 // Stepper setup
