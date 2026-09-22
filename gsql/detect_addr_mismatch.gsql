@@ -1,0 +1,48 @@
+// ============================================================================
+// Query 4: Detect Address Mismatch with New Device
+// High amount transaction with billing/shipping address mismatch + new/unrecognized device
+// ============================================================================
+USE GRAPH FraudInvestigationGraph
+
+CREATE OR REPLACE QUERY detect_addr_mismatch(VERTEX<Transaction> tx)
+RETURNS (BOOL has_mismatch, BOOL new_device, BOOL is_suspicious, STRING summary) {
+
+    SetAccum<STRING> @@bill_addrs;
+    SetAccum<STRING> @@ship_addrs;
+    SetAccum<STRING> @@devices;
+    
+    Start = { tx };
+    
+    Bill = SELECT a FROM Start:s -(BILLED_TO:e)-> Address:a
+           ACCUM @@bill_addrs += a.addr_hash;
+           
+    Ship = SELECT a FROM Start:s -(SHIPPED_TO:e)-> Address:a
+           ACCUM @@ship_addrs += a.addr_hash;
+           
+    Devs = SELECT d FROM Start:s -(USED_DEVICE:e)-> Device:d
+           ACCUM @@devices += d.device_id;
+           
+    BOOL mismatch = false;
+    IF @@bill_addrs.size() > 0 AND @@ship_addrs.size() > 0 THEN
+        // If sets don't overlap
+        FOREACH b IN @@bill_addrs DO
+            IF NOT @@ship_addrs.contains(b) THEN
+                mismatch = true;
+            END;
+        END;
+    END;
+    
+    // Check if addr1_match flag on transaction was false
+    IF tx.addr1_match == false THEN
+        mismatch = true;
+    END;
+    
+    BOOL is_new_dev = (@@devices.size() > 0);
+    BOOL suspicious = (mismatch AND tx.amount > 200.0);
+    
+    STRING res_summary = "Transaction " + tx.transaction_id + ": AddrMismatch=" + to_string(mismatch) + ", Amount=" + to_string(tx.amount);
+    
+    RETURN (mismatch, is_new_dev, suspicious, res_summary);
+}
+
+INSTALL QUERY detect_addr_mismatch

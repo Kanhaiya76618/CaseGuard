@@ -1,0 +1,48 @@
+// ============================================================================
+// Query 6: Get Customer Comprehensive Profile (Neighborhood Subgraph)
+// Retrieves 2-hop connected context for an investigated entity
+// ============================================================================
+USE GRAPH FraudInvestigationGraph
+
+CREATE OR REPLACE QUERY get_customer_profile(VERTEX<Customer> cust)
+RETURNS (
+    INT txn_count,
+    DOUBLE total_spend,
+    INT card_count,
+    INT device_count,
+    INT ip_count,
+    STRING summary
+) {
+    SetAccum<STRING> @@cards;
+    SetAccum<STRING> @@devices;
+    SetAccum<STRING> @@ips;
+    SumAccum<INT> @@tx_cnt = 0;
+    SumAccum<DOUBLE> @@spend = 0.0;
+    
+    Start = { cust };
+    
+    Cards = SELECT a FROM Start:s -(OWNS_CARD:e)-> Account:a
+            ACCUM @@cards += a.card_id;
+            
+    Txns = SELECT t FROM Start:s -(PERFORMED:e)-> Transaction:t
+           ACCUM @@tx_cnt += 1,
+                 @@spend += t.amount;
+                 
+    Devs = SELECT d FROM Txns:t -(USED_DEVICE:e)-> Device:d
+           ACCUM @@devices += d.device_id;
+           
+    IPs = SELECT ip FROM Txns:t -(FROM_IP:e)-> IPAddress:ip
+          ACCUM @@ips += ip.ip_id;
+          
+    INT tc = @@tx_cnt;
+    DOUBLE ts = @@spend;
+    INT cc = @@cards.size();
+    INT dc = @@devices.size();
+    INT ic = @@ips.size();
+    
+    STRING res_summary = "Customer " + cust.customer_id + ": " + to_string(tc) + " txns ($" + to_string(ts) + "), " + to_string(cc) + " cards, " + to_string(dc) + " devices, " + to_string(ic) + " IPs.";
+    
+    RETURN (tc, ts, cc, dc, ic, res_summary);
+}
+
+INSTALL QUERY get_customer_profile

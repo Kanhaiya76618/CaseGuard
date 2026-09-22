@@ -1,0 +1,164 @@
+// ============================================================================
+// CaseGuard - TigerGraph GSQL Schema Definition
+// Built for HHGOA Fraud Investigation Benchmark (IEEE-CIS Vesta-based)
+// ============================================================================
+
+CREATE GRAPH FraudInvestigationGraph()
+
+USE GRAPH FraudInvestigationGraph
+
+// ----------------------------------------------------------------------------
+// Vertices: Core Entities
+// ----------------------------------------------------------------------------
+CREATE VERTEX Customer (
+    PRIMARY_ID customer_id STRING,
+    name STRING,
+    email STRING,
+    phone STRING,
+    billing_country STRING,
+    created_at DATETIME,
+    risk_tier STRING
+) WITH STATS="OUTDEGREE_BY_EDGETYPE";
+
+CREATE VERTEX Account (
+    PRIMARY_ID card_id STRING,
+    card_type STRING,
+    issuer STRING,
+    first_seen DATETIME,
+    status STRING
+) WITH STATS="OUTDEGREE_BY_EDGETYPE";
+
+CREATE VERTEX Transaction (
+    PRIMARY_ID transaction_id STRING,
+    amount DOUBLE,
+    timestamp DATETIME,
+    bank_risk_score DOUBLE,
+    product_cd STRING,
+    card_type STRING,
+    addr1_match BOOL,
+    dist1 DOUBLE,
+    c1 INT,
+    c2 INT,
+    v100 DOUBLE,
+    v200 DOUBLE,
+    v300 DOUBLE
+) WITH STATS="OUTDEGREE_BY_EDGETYPE";
+
+CREATE VERTEX Device (
+    PRIMARY_ID device_id STRING,
+    device_type STRING,
+    device_info STRING,
+    first_seen DATETIME
+) WITH STATS="OUTDEGREE_BY_EDGETYPE";
+
+CREATE VERTEX IPAddress (
+    PRIMARY_ID ip_id STRING,
+    ip_str STRING,
+    country STRING,
+    isp STRING,
+    first_seen DATETIME
+) WITH STATS="OUTDEGREE_BY_EDGETYPE";
+
+CREATE VERTEX EmailDomain (
+    PRIMARY_ID domain_id STRING,
+    first_seen DATETIME
+) WITH STATS="OUTDEGREE_BY_EDGETYPE";
+
+CREATE VERTEX Address (
+    PRIMARY_ID addr_hash STRING,
+    zip STRING,
+    country STRING
+) WITH STATS="OUTDEGREE_BY_EDGETYPE";
+
+// ----------------------------------------------------------------------------
+// Vertices: Intelligence, Typologies & Policy
+// ----------------------------------------------------------------------------
+CREATE VERTEX FraudPattern (
+    PRIMARY_ID pattern_id STRING,
+    name STRING,
+    severity STRING,
+    description STRING,
+    gsql_detector STRING
+) WITH STATS="OUTDEGREE_BY_EDGETYPE";
+
+CREATE VERTEX PolicyRule (
+    PRIMARY_ID rule_id STRING,
+    category STRING, // block, monitor, escalate, sar
+    rule_text STRING,
+    threshold DOUBLE
+) WITH STATS="OUTDEGREE_BY_EDGETYPE";
+
+CREATE VERTEX PriorCase (
+    PRIMARY_ID case_id STRING,
+    opened_at DATETIME,
+    closed_at DATETIME,
+    outcome STRING, // fraud, cleared
+    pattern_id STRING,
+    summary STRING,
+    vector_embedding LIST<DOUBLE>
+) WITH STATS="OUTDEGREE_BY_EDGETYPE";
+
+// ----------------------------------------------------------------------------
+// Vertices: Live Investigation Records & Audit Trail
+// ----------------------------------------------------------------------------
+CREATE VERTEX InvestigationCase (
+    PRIMARY_ID case_id STRING,
+    trigger_type STRING,
+    trigger_ref STRING,
+    status STRING, // open, needs_evidence, acted, closed
+    risk_level STRING,
+    confidence DOUBLE,
+    opened_at DATETIME,
+    updated_at DATETIME,
+    summary STRING,
+    decision_log STRING,
+    vector_embedding LIST<DOUBLE>
+) WITH STATS="OUTDEGREE_BY_EDGETYPE";
+
+CREATE VERTEX Evidence (
+    PRIMARY_ID evidence_id STRING,
+    source STRING, // graph, policy, prior_case, external
+    evidence_type STRING,
+    content STRING,
+    collected_at DATETIME,
+    confidence_weight DOUBLE
+) WITH STATS="OUTDEGREE_BY_EDGETYPE";
+
+CREATE VERTEX Action (
+    PRIMARY_ID action_id STRING,
+    action_type STRING,
+    status STRING, // recommended, executed, pending_approval
+    approval_route STRING,
+    reasoning STRING,
+    recorded_at DATETIME,
+    is_nba_before BOOL,
+    is_nba_after BOOL
+) WITH STATS="OUTDEGREE_BY_EDGETYPE";
+
+// ----------------------------------------------------------------------------
+// Edges: Transaction & Identity Topology
+// ----------------------------------------------------------------------------
+CREATE DIRECTED EDGE PERFORMED (FROM Customer, TO Transaction) WITH REVERSE_EDGE="PERFORMED_BY";
+CREATE DIRECTED EDGE OWNS_CARD (FROM Customer, TO Account) WITH REVERSE_EDGE="OWNED_BY";
+CREATE DIRECTED EDGE USED_CARD (FROM Transaction, TO Account) WITH REVERSE_EDGE="CARD_USED_IN";
+CREATE DIRECTED EDGE USED_DEVICE (FROM Transaction, TO Device) WITH REVERSE_EDGE="DEVICE_USED_IN";
+CREATE DIRECTED EDGE FROM_IP (FROM Transaction, TO IPAddress) WITH REVERSE_EDGE="IP_ORIGIN_FOR";
+CREATE DIRECTED EDGE HAS_DEVICE (FROM Customer, TO Device) WITH REVERSE_EDGE="DEVICE_OF_CUSTOMER";
+CREATE DIRECTED EDGE FROM_EMAIL (FROM Customer, TO EmailDomain) WITH REVERSE_EDGE="EMAIL_OF_CUSTOMER";
+CREATE DIRECTED EDGE BILLED_TO (FROM Transaction, TO Address) WITH REVERSE_EDGE="BILLING_ADDR_FOR";
+CREATE DIRECTED EDGE SHIPPED_TO (FROM Transaction, TO Address) WITH REVERSE_EDGE="SHIPPING_ADDR_FOR";
+
+// ----------------------------------------------------------------------------
+// Edges: Memory, Patterns, and Provenance Lineage
+// ----------------------------------------------------------------------------
+CREATE DIRECTED EDGE CASE_INVOLVED_CUSTOMER (FROM PriorCase, TO Customer);
+CREATE DIRECTED EDGE CASE_INVOLVED_TRANSACTION (FROM PriorCase, TO Transaction);
+CREATE DIRECTED EDGE EXHIBITED_PATTERN (FROM PriorCase, TO FraudPattern);
+
+CREATE DIRECTED EDGE TRIGGERED_BY (FROM InvestigationCase, TO Transaction);
+CREATE DIRECTED EDGE TARGETS_CUSTOMER (FROM InvestigationCase, TO Customer);
+CREATE DIRECTED EDGE HAS_EVIDENCE (FROM InvestigationCase, TO Evidence);
+CREATE DIRECTED EDGE HAS_ACTION (FROM InvestigationCase, TO Action);
+CREATE DIRECTED EDGE MATCHED_PATTERN (FROM InvestigationCase, TO FraudPattern);
+CREATE DIRECTED EDGE REFERENCES_RULE (FROM Action, TO PolicyRule);
+CREATE DIRECTED EDGE SIMILAR_TO_PRIOR_CASE (FROM InvestigationCase, TO PriorCase, similarity DOUBLE);

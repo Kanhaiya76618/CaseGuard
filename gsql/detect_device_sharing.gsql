@@ -1,0 +1,35 @@
+// ============================================================================
+// Query 1: Detect Device Sharing
+// A single device linked to multiple distinct Customers or Accounts within a window
+// ============================================================================
+USE GRAPH FraudInvestigationGraph
+
+CREATE OR REPLACE QUERY detect_device_sharing(VERTEX<Device> dev, INT hours_window = 72, INT min_distinct_accounts = 2) 
+RETURNS (INT account_count, INT customer_count, BOOL is_suspicious, STRING summary) {
+    
+    OrAccum @visited = false;
+    SetAccum<STRING> @@accounts;
+    SetAccum<STRING> @@customers;
+    
+    Start = { dev };
+    
+    // 1-hop: Transactions originating from this device
+    Txns = SELECT t FROM Start:s -(DEVICE_USED_IN:e)-> Transaction:t;
+    
+    // Hop to Accounts and Customers
+    Accs = SELECT a FROM Txns:t -(USED_CARD:e)-> Account:a
+           ACCUM @@accounts += a.card_id;
+           
+    Custs = SELECT c FROM Txns:t -(PERFORMED_BY:e)-> Customer:c
+            ACCUM @@customers += c.customer_id;
+            
+    INT acc_cnt = @@accounts.size();
+    INT cust_cnt = @@customers.size();
+    BOOL suspicious = (acc_cnt >= min_distinct_accounts OR cust_cnt >= min_distinct_accounts);
+    
+    STRING res_summary = "Device linked to " + to_string(acc_cnt) + " cards and " + to_string(cust_cnt) + " customers.";
+    
+    RETURN (acc_cnt, cust_cnt, suspicious, res_summary);
+}
+
+INSTALL QUERY detect_device_sharing

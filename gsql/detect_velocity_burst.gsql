@@ -1,0 +1,31 @@
+// ============================================================================
+// Query 2: Detect Velocity Burst
+// Rapid succession of transactions on a single Card or Customer account
+// ============================================================================
+USE GRAPH FraudInvestigationGraph
+
+CREATE OR REPLACE QUERY detect_velocity_burst(VERTEX<Account> acc, INT hours_window = 24, INT burst_threshold = 4)
+RETURNS (INT txn_count, DOUBLE total_amount, DOUBLE avg_risk_score, BOOL is_burst, STRING summary) {
+
+    SumAccum<INT> @@count = 0;
+    SumAccum<DOUBLE> @@amount = 0.0;
+    AvgAccum @@avg_risk;
+    
+    Start = { acc };
+    
+    Txns = SELECT t FROM Start:s -(CARD_USED_IN:e)-> Transaction:t
+           ACCUM @@count += 1,
+                 @@amount += t.amount,
+                 @@avg_risk += t.bank_risk_score;
+                 
+    INT total_txns = @@count;
+    DOUBLE sum_amt = @@amount;
+    DOUBLE mean_risk = @@avg_risk;
+    BOOL burst = (total_txns >= burst_threshold);
+    
+    STRING res_summary = "Card had " + to_string(total_txns) + " transactions totaling $" + to_string(sum_amt) + " with avg risk " + to_string(mean_risk);
+    
+    RETURN (total_txns, sum_amt, mean_risk, burst, res_summary);
+}
+
+INSTALL QUERY detect_velocity_burst

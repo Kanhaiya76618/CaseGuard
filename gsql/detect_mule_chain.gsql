@@ -1,0 +1,34 @@
+// ============================================================================
+// Query 5: Detect Mule Chain / Rapid Multi-hop Pass-through
+// Fast money movement across cards or linked customers
+// ============================================================================
+USE GRAPH FraudInvestigationGraph
+
+CREATE OR REPLACE QUERY detect_mule_chain(VERTEX<Account> start_acc, INT max_depth = 3)
+RETURNS (INT hops_found, BOOL is_mule_chain, STRING summary) {
+
+    OrAccum @visited = false;
+    SumAccum<INT> @@hop_count = 0;
+    
+    Start = { start_acc };
+    Curr = Start;
+    
+    WHILE Curr.size() > 0 AND @@hop_count < max_depth DO
+        @@hop_count += 1;
+        // Hop Account -> Txn -> Customer -> Account
+        Txns = SELECT t FROM Curr:c -(CARD_USED_IN:e)-> Transaction:t;
+        Custs = SELECT cu FROM Txns:t -(PERFORMED_BY:e)-> Customer:cu;
+        NextAccs = SELECT a FROM Custs:cu -(OWNS_CARD:e)-> Account:a
+                   WHERE a != start_acc AND NOT a.@visited
+                   ACCUM a.@visited = true;
+        Curr = NextAccs;
+    END;
+    
+    INT hops = @@hop_count;
+    BOOL is_mule = (hops >= 2);
+    STRING res_summary = "Traced " + to_string(hops) + " hops through linked customer accounts.";
+    
+    RETURN (hops, is_mule, res_summary);
+}
+
+INSTALL QUERY detect_mule_chain

@@ -1,0 +1,30 @@
+// ============================================================================
+// Query 3: Detect IP Clustering
+// Single IP used across multiple distinct customers or geographic discrepancies
+// ============================================================================
+USE GRAPH FraudInvestigationGraph
+
+CREATE OR REPLACE QUERY detect_ip_clustering(VERTEX<IPAddress> ip_node, INT min_customers = 3)
+RETURNS (INT customer_count, INT transaction_count, BOOL is_clustered, STRING summary) {
+
+    SetAccum<STRING> @@customers;
+    SumAccum<INT> @@txn_count = 0;
+    
+    Start = { ip_node };
+    
+    Txns = SELECT t FROM Start:s -(IP_ORIGIN_FOR:e)-> Transaction:t
+           ACCUM @@txn_count += 1;
+           
+    Custs = SELECT c FROM Txns:t -(PERFORMED_BY:e)-> Customer:c
+            ACCUM @@customers += c.customer_id;
+            
+    INT cust_cnt = @@customers.size();
+    INT tx_cnt = @@txn_count;
+    BOOL clustered = (cust_cnt >= min_customers);
+    
+    STRING res_summary = "IP " + ip_node.ip_str + " associated with " + to_string(cust_cnt) + " unique customers across " + to_string(tx_cnt) + " txns.";
+    
+    RETURN (cust_cnt, tx_cnt, clustered, res_summary);
+}
+
+INSTALL QUERY detect_ip_clustering
