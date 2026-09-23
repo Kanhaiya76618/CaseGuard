@@ -3,6 +3,14 @@
 > TigerGraph-powered AI agent for fraud investigation, uncertainty-gated evidence gathering, and next-best-action recommendations.
 > Built for the HHGOA Hackathon (TigerGraph Agentic Fraud Investigation).
 
+[![Dev.to Blog Post](https://img.shields.io/badge/Dev.to-Technical%20Blog%20Post-0A0A0A?style=for-the-badge&logo=devdotto)](https://dev.to/kanha_9650/-caseguard-winning-with-uncertainty-gated-agentic-fraud-investigation-on-tigergraph-407p)
+[![X Announcement](https://img.shields.io/badge/X-Social%20Post-1DA1F2?style=for-the-badge&logo=x)](https://x.com/Kanhaiy41867349/status/2102605055862153410?s=20)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+
+- 📖 **Technical Blog Post**: [Read on Dev.to](https://dev.to/kanha_9650/-caseguard-winning-with-uncertainty-gated-agentic-fraud-investigation-on-tigergraph-407p)
+- 🐦 **X (Twitter) Announcement**: [View Tweet](https://x.com/Kanhaiy41867349/status/2102605055862153410?s=20)
+
+
 ## Architecture
 
 ```
