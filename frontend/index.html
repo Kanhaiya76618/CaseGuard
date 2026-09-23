@@ -5,6 +5,513 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hacker House Goa · CaseGuard</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+/* ==========================================================================
+   CaseGuard — Clean Editorial / Warm Minimalist Design System
+   Exact match to the Hacker House Goa Builder ID reference:
+   - Warm cream background (#FBF7EE)
+   - Deep forest pine green (#0E3B2E / #124032)
+   - Terracotta / warm rust coral accent (#DC6B4D / #E07052)
+   - Subtle pastel sage green and sun gold background graphic curves
+   - Classic high-contrast editorial serif typography ('Fraunces' / 'Newsreader')
+   - Modern clean sans-serif for UI accents ('Plus Jakarta Sans' / 'Inter')
+   - Distinctive stepped stepper (1 -> 2 -> 3 -> 4)
+   - Clean dashed interactive dropzone card
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  --bg-canvas: #FAF6ED;
+  --bg-surface: #FFFFFF;
+  --bg-surface-subtle: #F5EFE1;
+  --bg-tint-sage: #D5E2D5;
+  --bg-tint-sun: #FBE6AA;
+
+  /* Primary Palette */
+  --text-headline: #11382B; /* Dark Pine Green */
+  --text-accent: #DB6244;   /* Terracotta / Rust */
+  --text-body: #4F5E56;     /* Slate Sage */
+  --text-muted: #8E9B93;    /* Light Sage Gray */
+
+  --forest-green: #0F3E30;
+  --forest-hover: #08291F;
+  --terracotta: #DB6244;
+  --terracotta-hover: #C65134;
+  --sand-border: #E8E0CE;
+  --sand-dashed: #9EB0A1;
+
+  /* Fonts */
+  --font-editorial: 'Fraunces', serif, Georgia;
+  --font-ui: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-pill: 9999px;
+
+  --shadow-soft: 0 4px 20px rgba(17, 56, 43, 0.05);
+  --shadow-float: 0 12px 36px rgba(17, 56, 43, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-canvas);
+  color: var(--text-body);
+  font-family: var(--font-ui);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Background Organic Shapes (Exact match to reference) */
+.bg-decorations {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+/* Bottom Left Sage Pastel Arch */
+.decor-sage-corner {
+  position: absolute;
+  bottom: -100px;
+  left: -80px;
+  width: 380px;
+  height: 380px;
+  border-radius: 50%;
+  background: var(--bg-tint-sage);
+  opacity: 0.65;
+}
+
+/* Top Right Sun Golden Ring Arc */
+.decor-sun-ring {
+  position: absolute;
+  top: 60px;
+  right: 80px;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  border: 24px solid var(--bg-tint-sun);
+  opacity: 0.85;
+}
+
+/* Top Navigation Bar */
+.site-header {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 48px;
+  max-width: 1360px;
+  margin: 0 auto;
+}
+
+.brand-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.brand-icon-box {
+  width: 36px;
+  height: 36px;
+  background-color: var(--forest-green);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #F8F5EE;
+  font-size: 18px;
+}
+
+.brand-name {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text-headline);
+  letter-spacing: -0.01em;
+}
+
+.header-badge-tag {
+  border: 1px solid var(--sand-border);
+  background: rgba(255, 255, 255, 0.6);
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  color: var(--text-headline);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Main Container */
+.main-wrapper {
+  position: relative;
+  z-index: 5;
+  max-width: 900px;
+  margin: 20px auto 80px;
+  padding: 0 24px;
+  text-align: center;
+}
+
+/* Category Pill Tag */
+.category-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid var(--sand-border);
+  padding: 5px 16px;
+  border-radius: var(--radius-pill);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--forest-green);
+  margin-bottom: 24px;
+}
+
+.category-pill svg {
+  width: 14px;
+  height: 14px;
+  fill: var(--forest-green);
+}
+
+/* Hero Headline */
+.hero-title {
+  font-family: var(--font-editorial);
+  font-size: 4rem;
+  line-height: 1.05;
+  font-weight: 700;
+  color: var(--text-headline);
+  letter-spacing: -0.03em;
+  margin-bottom: 18px;
+}
+
+.hero-title span.highlight {
+  color: var(--text-accent);
+  display: block;
+}
+
+.hero-subtext {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--text-body);
+  max-width: 580px;
+  margin: 0 auto 16px;
+  font-weight: 400;
+}
+
+.scroll-indicator {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--text-accent);
+  font-size: 1.2rem;
+  margin-bottom: 34px;
+  animation: bounceDown 2s infinite;
+}
+
+@keyframes bounceDown {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(6px); }
+}
+
+/* Stepper Navigation (1 Upload - 2 Investigate - 3 Uncertainty - 4 Action) */
+.stepper-nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 34px;
+}
+
+.step-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.step-circle {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border: 1px solid var(--sand-border);
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.step-item.active {
+  color: var(--text-headline);
+}
+
+.step-item.active .step-circle {
+  background-color: var(--forest-green);
+  color: #FFFFFF;
+  border-color: var(--forest-green);
+}
+
+.step-divider {
+  width: 28px;
+  height: 1px;
+  background-color: var(--sand-border);
+}
+
+/* Core Dashboard Card */
+.content-box {
+  background: #FAF6ED;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+/* Step 1: Clean Dashed Dropzone Card */
+.dropzone-card {
+  background: rgba(255, 255, 255, 0.45);
+  border: 2px dashed var(--sand-dashed);
+  border-radius: var(--radius-md);
+  padding: 56px 32px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.dropzone-card:hover {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: var(--forest-green);
+  transform: translateY(-2px);
+}
+
+.upload-icon-tile {
+  width: 54px;
+  height: 54px;
+  background-color: var(--forest-green);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.dropzone-title {
+  font-family: var(--font-editorial);
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: var(--text-headline);
+  margin-bottom: 6px;
+}
+
+.dropzone-hint {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* Case Selector Tray */
+.case-pills-bar {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 16px 4px 6px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.case-select-pill {
+  border: 1px solid var(--sand-border);
+  background: rgba(255, 255, 255, 0.8);
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-headline);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  transition: all 0.15s ease;
+}
+
+.case-select-pill:hover,
+.case-select-pill.selected {
+  background: var(--forest-green);
+  color: #FFFFFF;
+  border-color: var(--forest-green);
+}
+
+/* Step Views Containers */
+.step-view {
+  display: none;
+}
+
+.step-view.active-view {
+  display: block;
+  animation: viewFade 0.25s ease-out;
+}
+
+@keyframes viewFade {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Clean Editorial Card */
+.editorial-card {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid var(--sand-border);
+  border-radius: var(--radius-md);
+  padding: 32px;
+  text-align: left;
+  box-shadow: var(--shadow-soft);
+}
+
+.editorial-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-bottom: 1px solid var(--sand-border);
+  padding-bottom: 14px;
+  margin-bottom: 20px;
+}
+
+.editorial-card-title {
+  font-family: var(--font-editorial);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-headline);
+}
+
+.editorial-card-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-accent);
+  letter-spacing: 0.05em;
+}
+
+/* Info Grid */
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+.detail-item label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.detail-item value {
+  display: block;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-headline);
+}
+
+/* Action Box Comparison */
+.action-compare-box {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.action-card-simple {
+  background: var(--bg-surface-subtle);
+  border: 1px solid var(--sand-border);
+  border-radius: var(--radius-sm);
+  padding: 18px;
+}
+
+.action-card-tag {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-accent);
+  margin-bottom: 6px;
+}
+
+.action-card-name {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--forest-green);
+  margin-bottom: 8px;
+}
+
+.action-card-text {
+  font-size: 0.8rem;
+  color: var(--text-body);
+  line-height: 1.5;
+}
+
+/* Minimalist Button */
+.btn-editorial {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--forest-green);
+  color: #FFFFFF;
+  border: none;
+  outline: none;
+  padding: 12px 24px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 24px;
+}
+
+.btn-editorial:hover {
+  background: var(--forest-hover);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .site-header { padding: 18px 24px; }
+  .hero-title { font-size: 2.7rem; }
+  .detail-grid, .action-compare-box { grid-template-columns: 1fr; }
+  .stepper-nav { flex-wrap: wrap; }
+}
+
+  </style>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌴</text></svg>">
 </head>
 <body>
