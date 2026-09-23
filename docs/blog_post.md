@@ -2,6 +2,8 @@
 
 *A technical breakdown of our submission for the TigerGraph HHGOA Hackathon.*
 
+![CaseGuard Architecture & Investigation Graph](assets/blog_cover.jpg)
+
 ---
 
 ## 1. Executive Summary
