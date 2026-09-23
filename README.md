@@ -105,13 +105,26 @@ caseguard/
 - **Case memory = graph-first** — prior cases as vertices + TigerVector embeddings for hybrid retrieval
 - **GraphRAG for policy** — relevant policy clauses retrieved, not raw doc dumps
 
+## Autonomous Monitoring & Innovation Cases (Innovation 15%)
+
+Per Line 19 of the official dataset specification:
+> *"Optional. If your agent also monitors the exam period on its own, picks up alerts from the risk scores, and investigates beyond the 20 cases, put those in a separate folder. They count toward Innovation, not accuracy."*
+
+CaseGuard continuously scans real-time streams beyond the initial 20 exam cases. We provide **5 additional autonomous monitoring cases** (`HHG-021` to `HHG-025`) in `cases_autonomous/` (and `cases/extra/`), also discoverable in the live Web UI:
+- **`HHG-021`**: Automated Headless Card Testing probe burst & rapid escalation (Policy R5).
+- **`HHG-022`**: High-Exposure Cross-Border Syndicate & TOR Device Sharing Ring with FinCEN SAR filing over $5,000 (Policies R2, R6).
+- **`HHG-023`**: Out-of-region legitimate business travel false positive resolution (Policies R1, R3).
+- **`HHG-024`**: Account Takeover (ATO) brute-force credential stuffing with full customer card quarantine (Policies R2, R10).
+- **`HHG-025`**: Undocumented Velocity Stacking & multi-merchant structured draining attack (Policy R9).
+
 ## Judging Alignment
 
 | Criterion | How We Win It |
 |-----------|---------------|
-| Investigation accuracy (25%) | 7 GSQL pattern queries + calibrated thresholds |
-| Next best action (25%) | Explicit NBA decision tree + before/after recording |
-| Case summary/explainability (10%) | Structured case schema + grounded LLM summary |
-| Agentic design (15%) | LangGraph + MCP + permission guardrails |
-| Innovation (15%) | Case-memory-as-graph + hybrid GraphRAG + TigerVector |
-| Demo (10%) | Streamlit dashboard with graph viz + confidence meter |
+| Investigation accuracy (25%) | 7 GSQL pattern queries + calibrated thresholds on official 20 benchmark cases (`cases/`) |
+| Next best action (25%) | Explicit NBA decision tree + before/after recording conforming to Bank Fraud Policy v1.0 |
+| Case summary/explainability (10%) | Structured 3-part case schema + grounded LLM summary and FinCEN SAR narratives |
+| Agentic design (15%) | LangGraph cyclic investigation loop + TigerGraph MCP + permission guardrails |
+| Innovation (15%) | Autonomous monitoring folder (`cases_autonomous/`), case memory as graph, hybrid GraphRAG |
+| Demo (10%) | Hacker House Goa editorial UI + dynamic live investigation engine at `http://localhost:8000` |
+

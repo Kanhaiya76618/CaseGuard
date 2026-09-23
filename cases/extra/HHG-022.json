@@ -1,0 +1,138 @@
+{
+  "case_id": "HHG-022",
+  "case": {
+    "status": "closed_fraud",
+    "verdict": "fraud",
+    "fraud_probability": 0.96,
+    "pattern": "card_not_present_new_device",
+    "pattern_description": "",
+    "affected_txn_ids": [
+      "3591400",
+      "3591408"
+    ],
+    "first_suspicious_txn_id": "3591400",
+    "connected_card_ids": [
+      "C04812-K1",
+      "C09231-K2"
+    ],
+    "connected_device_profiles": [
+      "Windows 10 | Chrome 64.0 | 1920x1080 | Proxy TOR-EXIT-US"
+    ],
+    "exposure_usd": 5820.5,
+    "evidence": [
+      {
+        "claim": "Transaction 3591400 ($3,420.50) executed via novel high-anonymity device profile (TOR exit node proxy) with mismatching billing zip.",
+        "source": "graph",
+        "ref": "query:transaction_lookup(tx_id=3591400)",
+        "entity_ids": [
+          "3591400",
+          "C14209-K1"
+        ]
+      },
+      {
+        "claim": "TigerGraph 2-hop neighborhood expansion reveals device profile is linked to 2 other active fraud investigations on cards C04812-K1 and C09231-K2.",
+        "source": "graph",
+        "ref": "query:shared_device_ring(device_id=DEV-WIN10-TOR)",
+        "entity_ids": [
+          "DEV-WIN10-TOR",
+          "C04812-K1",
+          "C09231-K2"
+        ]
+      },
+      {
+        "claim": "Out-of-band step-up authentication challenge timed out with consecutive invalid OTP token entries.",
+        "source": "customer",
+        "ref": "evidence_request:1",
+        "entity_ids": [
+          "C14209"
+        ]
+      },
+      {
+        "claim": "Historical case CC-3104 confirmed identical e-commerce merchant attack signature and TOR exit proxy infrastructure.",
+        "source": "graph",
+        "ref": "query:case_similarity(pattern=card_not_present_new_device)",
+        "entity_ids": [
+          "CC-3104"
+        ]
+      }
+    ],
+    "similar_prior_cases": [
+      "CC-3104",
+      "CC-4512",
+      "CC-4890"
+    ],
+    "summary": "Case HHG-022: high-exposure CNP fraud syndicate on card C14209-K1 linked via TOR device profile to cards C04812-K1 and C09231-K2. Exposure $5,820.50. Card blocked under L2 approval, mandatory SAR filed under rules R2 and R6.",
+    "written_to_graph": true,
+    "graph_case_id": "CASE-TG-HHG-022"
+  },
+  "evidence_requests": [
+    {
+      "type": "step_up_auth",
+      "asked_after_step": 2,
+      "assumed_response": "Out-of-band step-up authentication challenge timed out with consecutive invalid OTP token entries."
+    }
+  ],
+  "next_best_actions": {
+    "initial": [
+      {
+        "action": "DECLINE_TRANSACTION",
+        "route": "L1",
+        "reason": "R1: critical fraud score and TOR proxy presence warrant immediate authorization freeze"
+      },
+      {
+        "action": "VERIFY_WITH_CUSTOMER",
+        "route": "auto",
+        "reason": "R1: verify transaction authenticity out-of-band"
+      }
+    ],
+    "final": [
+      {
+        "action": "BLOCK_CARD",
+        "route": "L2",
+        "reason": "R2: confirmed fraudulent unauthorized charge with exposure exceeding $2,500 ($5,820.50 total)"
+      },
+      {
+        "action": "BLOCK_ALL_CARDS",
+        "route": "L2",
+        "reason": "R10: customer holds multiple accounts under active compromise attempt"
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "R2: internal fraud case logged to TigerGraph memory"
+      },
+      {
+        "action": "FILE_REPORT",
+        "route": "L2",
+        "reason": "R2 and R6: exposure exceeds $1,000 and shared origin across multiple distinct customer accounts confirms organized fraud ring"
+      },
+      {
+        "action": "MONITOR_CONNECTED_CARDS",
+        "route": "auto",
+        "reason": "R6: place connected syndicate cards C04812-K1 and C09231-K2 under heightened surveillance"
+      }
+    ],
+    "what_changed": "Failed step-up auth and graph neighborhood confirmation of multi-customer device ring escalated severity. Triggered L2 executive card blocking, mandatory SAR filing, and cross-card surveillance under rules R2, R6, and R10."
+  },
+  "sar": {
+    "file": true,
+    "reason": "R2 and R6: Confirmed unauthorized CNP fraud exceeding $1,000 ($5,820.50) originating from a shared proxy device cluster linked to multiple customer accounts.",
+    "narrative": "On 2016-12-16, CaseGuard autonomous monitoring detected unauthorized e-commerce transactions totaling $5,820.50 on card C14209-K1 held by customer C14209. Initial flagged authorization 3591400 ($3,420.50) and subsequent charge 3591408 ($2,400.00) originated from an anonymized TOR exit proxy device profile (DEV-WIN10-TOR). TigerGraph entity resolution linked this exact device profile to ongoing fraudulent activity across two separate customer accounts: card C04812-K1 (customer C04812) and card C09231-K2 (customer C09231), establishing an organized card-not-present fraud ring. Out-of-band customer verification attempts failed with multiple invalid token entries. All subject cards have been permanently terminated under L2 fraud management approval, and a formal SAR is submitted to FinCEN pursuant to 31 CFR 1020.320.",
+    "subjects": [
+      "C14209",
+      "C14209-K1",
+      "C04812-K1",
+      "C09231-K2",
+      "DEV-WIN10-TOR"
+    ],
+    "total_amount_usd": 5820.5,
+    "activity_dates": [
+      "2016-12-16",
+      "2016-12-16"
+    ]
+  },
+  "stop_reason": "High-exposure syndicate confirmed across graph edges. Mandatory SAR generated, L2 approvals logged, and connected cards secured.",
+  "tool_calls": 14,
+  "tokens": 6720,
+  "latency_s": 8.75
+}

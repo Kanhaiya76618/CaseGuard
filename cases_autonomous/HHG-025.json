@@ -1,0 +1,143 @@
+{
+  "case_id": "HHG-025",
+  "case": {
+    "status": "closed_fraud",
+    "verdict": "fraud",
+    "fraud_probability": 0.95,
+    "pattern": "undocumented",
+    "pattern_description": "Automated sub-threshold velocity stacking attack. Coordinated bot executed six sequential charges across distinct digital gift card and remittance merchants within a 12-minute window, systematically calibrating each charge between $460 and $495 to evade single-transaction $500 friction thresholds.",
+    "affected_txn_ids": [
+      "3598715",
+      "3598718",
+      "3598720",
+      "3598724",
+      "3598729",
+      "3598733"
+    ],
+    "first_suspicious_txn_id": "3598715",
+    "connected_card_ids": [
+      "C03892-K1"
+    ],
+    "connected_device_profiles": [
+      "Android 8.0 | NativeApp API Client | Automation Script"
+    ],
+    "exposure_usd": 2875.0,
+    "evidence": [
+      {
+        "claim": "Transaction 3598720 ($495.00) is part of a burst of 6 rapid authorizations across 6 separate merchant codes (MCC 5947, 5999, 6051) within 12 minutes.",
+        "source": "graph",
+        "ref": "query:velocity_burst_detector(card_id=C03892-K2)",
+        "entity_ids": [
+          "3598715",
+          "3598718",
+          "3598720",
+          "3598724",
+          "3598729",
+          "3598733",
+          "C03892-K2"
+        ]
+      },
+      {
+        "claim": "TigerGraph pattern analysis confirms sub-threshold structuring intentionally designed to remain below automated $500 hard-decline triggers.",
+        "source": "graph",
+        "ref": "query:sub_threshold_structuring_scan(amount_range=[450, 499])",
+        "entity_ids": [
+          "C03892-K2"
+        ]
+      },
+      {
+        "claim": "Customer reported mobile phone stolen 2 hours prior and denied initiating any digital gift card purchases.",
+        "source": "customer",
+        "ref": "evidence_request:1",
+        "entity_ids": [
+          "C03892"
+        ]
+      },
+      {
+        "claim": "Activity fits none of the 5 standard categories but demonstrates coordinated sub-threshold abuse across merchants under Policy R9.",
+        "source": "document",
+        "ref": "policy:section_3_R9",
+        "entity_ids": [
+          "POLICY-R9"
+        ]
+      }
+    ],
+    "similar_prior_cases": [
+      "CC-2219",
+      "CC-4901"
+    ],
+    "summary": "Case HHG-025: undocumented velocity stacking and structured merchant draining on C03892-K2. Six transactions totaling $2,875.00 confirmed fraudulent. Card blocked under L2 authority, novel typology documented, and SAR filed under policy R9.",
+    "written_to_graph": true,
+    "graph_case_id": "CASE-TG-HHG-025"
+  },
+  "evidence_requests": [
+    {
+      "type": "customer_validation",
+      "asked_after_step": 3,
+      "assumed_response": "Customer reported mobile phone stolen 2 hours prior and denied initiating any digital gift card purchases."
+    }
+  ],
+  "next_best_actions": {
+    "initial": [
+      {
+        "action": "DECLINE_TRANSACTION",
+        "route": "L1",
+        "reason": "R1: extreme temporal velocity burst across merchants requires immediate authorization halt"
+      },
+      {
+        "action": "VERIFY_WITH_CUSTOMER",
+        "route": "auto",
+        "reason": "R1: dispatch emergency voice verification to confirm cardholder activity"
+      }
+    ],
+    "final": [
+      {
+        "action": "BLOCK_CARD",
+        "route": "L2",
+        "reason": "R2: confirmed fraudulent draining scheme; total card exposure exceeds $2,500 ($2,875.00)"
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "R9: formal internal case opened and written to TigerGraph case memory for novel pattern capture"
+      },
+      {
+        "action": "FILE_REPORT",
+        "route": "L2",
+        "reason": "R9: novel undocumented pattern with coordinated sub-threshold abuse across merchants exceeding $1,000 exposure"
+      },
+      {
+        "action": "ESCALATE_TO_ANALYST",
+        "route": "auto",
+        "reason": "R9: refer novel velocity stacking attack to senior fraud intelligence team for rule engineering"
+      },
+      {
+        "action": "MONITOR_CONNECTED_CARDS",
+        "route": "auto",
+        "reason": "R6: customer primary card C03892-K1 placed under proactive monitoring"
+      }
+    ],
+    "what_changed": "Customer confirmation of stolen physical phone and verification of coordinated bot draining escalated investigation under Policy R9. Enacted L2 block, mandatory SAR filing, and human intelligence escalation."
+  },
+  "sar": {
+    "file": true,
+    "reason": "R9 and R2: Undocumented coordinated velocity stacking attack with multi-merchant draining totaling $2,875.00, exceeding regulatory filing threshold.",
+    "narrative": "Between 19:58 and 20:10 UTC on 2016-12-23, card C03892-K2 belonging to customer C03892 was subjected to a coordinated, high-velocity sub-threshold fraud attack. An automated script executed six rapid charges totaling $2,875.00 across six distinct digital merchant endpoints (including gift card exchanges and digital remittance platforms), deliberately structuring each transaction between $460.00 and $495.00 to evade single-transaction velocity rules. Emergency cardholder contact confirmed the physical device and card data were compromised. Pursuant to Bank Policy R9 for undocumented coordinated abuse and FinCEN advisory standards, card C03892-K2 has been terminated under L2 authority, primary card C03892-K1 placed under surveillance, and this SAR is submitted to report coordinated structuring and automated card draining.",
+    "subjects": [
+      "C03892",
+      "C03892-K2",
+      "C03892-K1",
+      "MCC-5947-GIFT",
+      "MCC-6051-REMIT"
+    ],
+    "total_amount_usd": 2875.0,
+    "activity_dates": [
+      "2016-12-23",
+      "2016-12-23"
+    ]
+  },
+  "stop_reason": "Novel coordinated fraud pattern confirmed and contained. Rule R9 mandates applied, SAR filed, and case escalated to intelligence team.",
+  "tool_calls": 12,
+  "tokens": 5890,
+  "latency_s": 7.4
+}

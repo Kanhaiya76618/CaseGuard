@@ -1,0 +1,6 @@
+case_id,opened_at,trigger_type,trigger_text,flagged_txn_id,card_id,customer_id,risk_score
+HHG-021,2016-12-14 04:12:08,risk_score,"Real-time model scored transaction 3589102 ($249.99, online digital merchant) at 0.81 following 3 micro-authorizations. Review and decide.",3589102,C06144-K1,C06144,0.81
+HHG-022,2016-12-16 11:24:19,risk_score,"Real-time model scored transaction 3591400 ($3,420.50, online luxury electronics) at 0.94. Review and decide.",3591400,C14209-K1,C14209,0.94
+HHG-023,2016-12-18 09:14:32,risk_score,"Real-time model scored transaction 3572819 ($340.00, in billing region 315.0) at 0.72. Review and decide.",3572819,C05128-K1,C05128,0.72
+HHG-024,2016-12-21 16:45:10,analyst_request,"Analyst alert: Security operations flagged credential stuffing burst on customer C11342 portal. Review transaction 3594811 ($850.00, online transfer).",3594811,C11342-K1,C11342,0.89
+HHG-025,2016-12-23 20:05:44,risk_score,"Real-time model scored transaction 3598720 ($495.00, online digital gift card) at 0.88. Multiple rapid cross-merchant authorizations detected.",3598720,C03892-K2,C03892,0.88
